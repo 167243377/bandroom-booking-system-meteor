@@ -1,0 +1,9 @@
+<template name="commentForm">
+    {{#autoForm collection="Comments" id="commentForm" type="insert" commentDocId=_id}}
+      {{> afQuickField name='content' id='content' rows=2}}
+    <button type="submit" doc="{{_id}}" class="btn btn-primary btn-sm">Comment</button>
+    {{#if cancelButton}}
+    <a class="btn-cancel-comment">Cancel</a>
+    {{/if}}
+  {{/autoForm}}
+</template>

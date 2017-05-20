@@ -1,0 +1,80 @@
+{
+
+	/*Config*/
+	"configName": "Band Room Booking System",
+	"configTitle": "Welcome to the Band Room Booking Admin System",
+	"configSubtitle": "Be a provider of the booking system, manage your rooms and reservations!",
+	
+	/*Home*/
+	"getstarted": "Get Started",
+	"dashboard": "Go to dashboard",
+	"learn": "Learn more",
+
+	"intro": "Band Room Booking System Admin",
+	"how": "How It Works",
+
+	"step_1": "Register an account",
+	"step_1_text": "Regeister an account to provide rooms",
+	"step_2": "Manage your rooms and reservations",
+	"step_2_text": "Using the admin page",
+	"step_3": "Manage your message",
+	"step_3_text": "After reservations created, go to the dashboard to check",
+
+	"section_ipad_header": "A booking agent system",
+	"section_ipad_text": "Do really cool stuff really quickly",
+	"section_ipad_btn": "Made by MeteorFactory",
+	"final_text": "Your life will be instantly better.",
+	"final_cta": "Take a look",
+
+	/*Shared*/
+
+	"favorite": "Favorite",
+
+	 /*Navbar*/
+	"admin": "Admin",
+	"profile": "Profile",
+	"account": "Account",
+	"signout": "Sign out",
+	"signup": "Sign up",
+	"login": "Log in",
+	"login2": "Login",
+	"edit_profile": "Edit Profile",
+	"notifications": "Notifications",
+
+	/*Not Found*/
+	"not_found": "Nothing here.",
+
+
+	/*Dashboard*/
+	"add_post": "Add a Post",
+	"add_post_btn": "Add Post",
+	"add_post_modal": "Add with a modal",
+	"add_post_modal_btn": "Add a new post",
+	"edit_post": "Edit post",
+	"delete": "Delete",
+	"favorites": "Favorites",
+
+	/*Account*/
+	"account_details": "Account Details",
+	"delete_account": "Delete Account",
+	"delete_account_warn": "There's no coming back from this one",
+	"delete_account_warn2": "Are you sure you want to delete your account?",
+	"close": "Close",
+	"change_pswd": "Change Password",
+
+	/*Profile*/
+	"update": "Update",
+
+	/*Posts*/
+
+	"postTitle": "Title",
+	"postContent": "Content",
+	"postPicture": "Picture",
+	// "uploadLabel": "Choose File"
+	"profilePicture": "Profile Picture"
+
+
+	
+
+
+}
