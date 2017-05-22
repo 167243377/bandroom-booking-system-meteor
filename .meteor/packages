@@ -77,3 +77,8 @@ facebook-config-ui
 google-config-ui
 twitter-config-ui
 mrt:moment-timezone
+chart:chart
+fullcalendar:fullcalendar
+drblue:fullcalendar
+rajit:bootstrap3-datepicker
+maazalik:highcharts

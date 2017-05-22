@@ -2,7 +2,7 @@
 1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
 1 verbose cli   'C:\\Users\\Kong\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js',
 1 verbose cli   'install',
-1 verbose cli   '--save' ]
+1 verbose cli   '--production' ]
 2 info using npm@2.14.5
 3 info using node@v6.9.5
 4 verbose readDependencies loading dependencies from C:\Projects\myapp\package.json
@@ -11,7 +11,7 @@
 6 verbose stack     at Error (native)
 7 verbose cwd C:\Projects\myapp
 8 error Windows_NT 10.0.14393
-9 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Users\\Kong\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js" "install" "--save"
+9 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Users\\Kong\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js" "install" "--production"
 10 error node v6.9.5
 11 error npm  v2.14.5
 12 error path C:\Projects\myapp\package.json

@@ -43,9 +43,9 @@ Schemas.Reservations = new SimpleSchema({
                 return "dateTimeMustbeIn15MintuesTimeSlot";
             }
 
-            if (new Date(this.value) <= new Date()) {
-                return "startTimeMustBeGreaterThanNow";
-            }
+            // if (new Date(this.value) <= new Date()) {
+            //     return "startTimeMustBeGreaterThanNow";
+            // }
 
             // if (this._id !== reservation._id) {
             //     //same room
@@ -108,6 +108,11 @@ Schemas.Reservations = new SimpleSchema({
             }
         }
     },
+    contactName: {
+        type: String,
+        label: '聯絡人名稱',
+        optional: true
+    },
     status: {
         type: String,
         label: '預約狀態',
@@ -131,18 +136,22 @@ Schemas.Reservations = new SimpleSchema({
     },
     totalAmount: {
         type: Number,
+        label: '房租',
+        blackbox: true,
         autoValue: function () {
+            if (this.isInsert) {
+                var diffDate = (new Date(this.field('endDateTime').value) - new Date(this.field('startDateTime').value));
+                var diffHours = Math.floor((diffDate % 86400000) / 3600000);
+                var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
 
-            var diffDate = (new Date(this.field('endDateTime').value) - new Date(this.field('startDateTime').value));
-            var diffHours = Math.floor((diffDate % 86400000) / 3600000);
-            var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
+                var totalAmount;
+                //total mintues / 60 = hours
 
-            var totalAmount;
-            //total mintues / 60 = hours
+                totalAmount = Rooms.findOne(this.field('room').value).price * (diffMintues / 60);
 
-            totalAmount = Rooms.findOne(this.field('room').value).price * (diffMintues / 60);
+                return totalAmount;
+            }
 
-            return totalAmount;
         }
 
     },
@@ -169,16 +178,6 @@ Schemas.Reservations = new SimpleSchema({
         autoValue: function () {
             if (this.isInsert) {
                 return Meteor.userId();
-            }
-        },
-        autoform: {
-            options: function () {
-                return _.map(Meteor.users.find().fetch(), function (user) {
-                    return {
-                        label: user.emails[0].address,
-                        value: user._id
-                    };
-                });
             }
         }
     }
