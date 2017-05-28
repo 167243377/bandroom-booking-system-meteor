@@ -1,7 +1,44 @@
 Template.calender.onCreated(function () {
+    var isRefresh = false;
+    var previousReservationsCount = 0;
+
     var self = this;
     self.autorun(function () {
         self.subscribe("rooms");
+        self.subscribe("centers");
+        self.subscribe("reservations", function () {
+            Tracker.autorun(function () {
+
+                //check whether a new reservation is added, a reactive display (real-time)
+                if (previousReservationsCount != 0 && previousReservationsCount !== Reservations.find().count()) {
+
+                    let newReservation = Reservations.findOne({}, {
+                        sort: {
+                            DateTime: -1,
+                            limit: 1
+                        }
+                    });
+
+                    let newReservationRoom = Rooms.findOne(newReservation.room);
+                    let newReservationCenter = Centers.findOne(newReservationRoom.center);
+
+                    playNotifySound();
+
+                    setTimeout(function () {
+                        alert('有一個新預約' + '\n' +
+                            "房間: " + newReservationCenter.name + " - " + newReservationRoom.description + '\n' +
+                            '預約時間: ' + formatDate(newReservation.startDateTime) + ' - ' + formatDate(newReservation.endDateTime));
+                    }, 1000);
+                    //Timeout makes asynchronous
+
+                }
+
+                showReservations();
+
+                previousReservationsCount = Reservations.find().count();
+
+            })
+        });
     });
 });
 
@@ -22,10 +59,14 @@ Template.calender.events({
 
 Template.calender.onRendered(() => {
     $('#gotodate-datepicker').datepicker();
+});
 
+
+function showReservations() {
+
+    console.log('showReservations');
     let reservations = [];
     let targetedReservations = Reservations.find();
-
     targetedReservations.fetch().map((reservation) => {
 
         let targetedRoom = Rooms.findOne(reservation.room);
@@ -50,6 +91,7 @@ Template.calender.onRendered(() => {
         })
     })
 
+    $('#myCalendar').fullCalendar('destroy');
     $('#myCalendar').fullCalendar({
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         defaultView: 'timelineDay',
@@ -95,4 +137,22 @@ Template.calender.onRendered(() => {
         }
         // other options go here...
     });
-});
+}
+
+function playNotifySound() {
+    var notificationSound = new buzz.sound('/audio/notify.ogg', {
+        autoplay: true
+    });
+}
+
+function formatDate(date) {
+    let inputDate = new Date(date);
+    var hours = inputDate.getHours();
+    var minutes = inputDate.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    return inputDate.getMonth() + "/" + inputDate.getDate() + "  " + strTime;
+}
