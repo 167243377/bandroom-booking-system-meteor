@@ -1,0 +1,24 @@
+<template name="analytics">
+	{{> highchartsHelper chartId="bookedTimeSlotDistribution" chartWidth="100%" chartHeight="100%" chartObject=line_RservationTimeSlotDistribution}}
+
+	<br>
+
+	<div class="row">
+		<div class="col-sm-6">
+			{{> highchartsHelper chartId="bar_bookedRoomsDistribution" chartWidth="100%" chartHeight="100%" chartObject=bar_bookedRoomsDistribution}}
+		</div>
+		<div class="col-sm-6">
+			{{> highchartsHelper chartId="bar_incomeDistribution" chartWidth="100%" chartHeight="100%" chartObject=bar_incomeDistribution}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-6">
+			{{> highchartsHelper chartId="pie_bookedRoomsDistribution" chartWidth="100%" chartHeight="100%" chartObject=pie_bookedRoomsDistribution}}
+		</div>
+		<div class="col-sm-6">
+			{{> highchartsHelper chartId="pie_incomeDistribution" chartWidth="100%" chartHeight="100%" chartObject=pie_incomeDistribution}}
+		</div>
+	</div>
+
+</template>

@@ -38,41 +38,56 @@ Schemas.Reservations = new SimpleSchema({
         },
         custom: function () {
 
+            if (Meteor.isClient) {
+                Meteor.subscribe('reservations');
+            }
+
+            var startDateTime = new Date(this.value);
+            var selectedRoom = Rooms.findOne(this.field('room').value);
+
+            //Rules #1: not in a 15 mintues period
             if (new Date(this.value).getMinutes() % 15 != 0) {
-                //not in a 15 mintues period
                 return "dateTimeMustbeIn15MintuesTimeSlot";
             }
 
-            // if (new Date(this.value) <= new Date()) {
-            //     return "startTimeMustBeGreaterThanNow";
-            // }
+            //Rules #2: check whether the room has non available booking period
+            if (selectedRoom.nonAvailablePeriod !== undefined) {
+                if (selectedRoom.nonAvailablePeriod.length > 0) {
 
-            // if (this._id !== reservation._id) {
-            //     //same room
-            //     //then check whether the time has already been booked.
-            //     if (new Date(reservation.endDateTime) > new Date(this.field('startDateTime').value)) {
-            //         console.log('come1');
-            //         //endDateTime = 2017/05/18 20:00 > this startDateTime 21:00 = FALSE
-            //         //endDateTime = 2017/05/18 20:00 > this startDateTime 20:30 = FALSE
-            //         //endDateTime = 2017/05/18 20:00 > this startDateTime 19:00 = true
-            //         var errorMsg = "重疊預約時間: " + formatDate(new Date(reservation.startDateTime)) + " - " + formatDate(new Date(reservation.endDateTime));
-            //         console.log(errorMsg);
+                    for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
 
-            //         return "dateTimeOverlap";
-            //     } else if (new Date(reservation.startDateTime) < new Date(this.field('endDateTime').value)) {
-            //         console.log('come2');
-            //         //startDateTime = 2017/05/18 20:00 < this endDateTime 20:00 = FALSE
-            //         //startDateTime = 2017/05/18 20:00 < this endDateTime 20:30 = TRUE
-            //         //startDateTime = 2017/05/18 20:00 ><this endDateTime 19:00 = FALSE
-            //         return "dateTimeOverlap" + ": 重疊預約時間 " + formatDate(new Date(reservation.startDateTime)) + " - " + formatDate(new Date(reservation.endDateTime));
-            //     } else {
-            //         console.log('come');
-            //         console.log(new Date(reservation.endDateTime) > new Date(this.field('startDateTime').value));
-            //     }
-            // }
+                        var currentNonAvailablePeriod = selectedRoom.nonAvailablePeriod[i];
 
-            // })
+                        var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
+                        var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
 
+                        //setHours to 0, we just compare the date only
+                        currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
+                        currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
+                        startDateTime.setHours(0, 0, 0, 0);
+
+                        if (startDateTime >= currentNonAvailablePeriodStartDate && startDateTime <= currentNonAvailablePeriodEndDate) {
+                            console.log('this period cannot be booked');
+                            return "nonAvailableBookingPeriod";
+                        }
+
+                    }
+                }
+            }
+
+            //Rules #3: check whether the room have already been booked.
+            var localISOString = toLocaleISOString(startDateTime);
+
+            var overlapReservation = Reservations.find({
+                room: selectedRoom._id,
+                status: { $in: ["To Be Started", "Closed"] },
+                startDateTime: { $lte: localISOString },
+                endDateTime: { $gt: localISOString }
+            }).fetch()
+
+            if (overlapReservation.length > 0) {
+                return "overlapReservationPeriod";
+            }
         }
     },
     endDateTime: {
@@ -83,13 +98,65 @@ Schemas.Reservations = new SimpleSchema({
         },
         custom: function () {
 
-            if (new Date(this.value).getMinutes() % 15 != 0) {
-                //not in a 15 mintues period
+            var startDateTime = new Date(this.field('startDateTime').value);
+            var endDateTime = new Date(this.value);
+            var selectedRoom = Rooms.findOne(this.field('room').value);
+
+            //Rules #1: not in a 15 mintues period
+            if (endDateTime.getMinutes() % 15 != 0) {
                 return "dateTimeMustbeIn15MintuesTimeSlot";
             }
 
-            if (new Date(this.value) <= this.field('startDateTime').value) {
+            //Rules #2: endDateTime cannot less than and eqaul to startDateTime
+            if (endDateTime < startDateTime) {
                 return "EndTimeMustBeGreaterThanStartTime";
+            }
+
+            //Rules #3: at least book 30 mins
+            var diffDate = new Date(endDateTime - startDateTime);
+            var diffHours = Math.floor((diffDate % 86400000) / 3600000);
+            var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
+
+            if (diffMintues < 30) {
+                return "atleastBook30Mins";
+            }
+
+            //Rules #4: check whether the room has non available booking period
+            if (selectedRoom.nonAvailablePeriod !== undefined) {
+                if (selectedRoom.nonAvailablePeriod.length > 0) {
+
+                    for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
+
+                        var currentNonAvailablePeriod = selectedRoom.nonAvailablePeriod[i];
+
+                        var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
+                        var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
+
+                        //setHours to 0, we just compare the date only
+                        currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
+                        currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
+                        endDateTime.setHours(0, 0, 0, 0);
+
+                        if (endDateTime >= currentNonAvailablePeriodStartDate && endDateTime <= currentNonAvailablePeriodEndDate) {
+                            console.log('this period cannot be booked');
+                            return "nonAvailableBookingPeriod";
+                        }
+                    }
+                }
+            }
+
+            //Rules #5: check whether the room have already been booked.
+            var localISOString = toLocaleISOString(endDateTime);
+
+            var overlapReservation = Reservations.find({
+                room: selectedRoom._id,
+                status: { $in: ["To Be Started", "Closed"] },
+                startDateTime: { $lt: localISOString },
+                endDateTime: { $gte: localISOString }
+            }).fetch()
+
+            if (overlapReservation.length > 0) {
+                return "overlapReservationPeriod";
             }
         }
     },
@@ -119,17 +186,17 @@ Schemas.Reservations = new SimpleSchema({
         allowedValues: ['To Be Started', 'Closed', 'Cancelled'],
         autoform: {
             options: [{
-                    label: "To Be Started",
-                    value: "To Be Started"
-                },
-                {
-                    label: "Closed",
-                    value: "Closed"
-                },
-                {
-                    label: "Cancelled",
-                    value: "Cancelled"
-                }
+                label: "To Be Started",
+                value: "To Be Started"
+            },
+            {
+                label: "Closed",
+                value: "Closed"
+            },
+            {
+                label: "Cancelled",
+                value: "Cancelled"
+            }
             ]
 
         }
@@ -137,7 +204,6 @@ Schemas.Reservations = new SimpleSchema({
     totalAmount: {
         type: Number,
         label: '房租',
-        blackbox: true,
         autoValue: function () {
             if (this.isInsert) {
                 var diffDate = (new Date(this.field('endDateTime').value) - new Date(this.field('startDateTime').value));
@@ -188,7 +254,10 @@ SimpleSchema.messages({
     "EndTimeMustBeGreaterThanStartTime": "完結時間不能早於開始時間",
     "dateTimeMustbeIn15MintuesTimeSlot": "時間必需以15分鐘為單位",
     "dateTimeOverlap": "預約時間重疊",
-    "phoneNoLengthIsNot8": "聯絡電話號碼長度必需為8位數字"
+    "phoneNoLengthIsNot8": "聯絡電話號碼長度必需為8位數字",
+    "nonAvailableBookingPeriod": "已選擇的日子為暫停預約",
+    "atleastBook30Mins": "最少預約時間為30分鐘",
+    "overlapReservationPeriod": "重疊預約時間"
 });
 
 Reservations.attachSchema(Schemas.Reservations);
@@ -254,4 +323,10 @@ function formatDate(date) {
     minutes = minutes < 10 ? '0' + minutes : minutes;
     var strTime = hours + ':' + minutes + ' ' + ampm;
     return date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+}
+
+function toLocaleISOString(date) {
+    var tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+    var localISOString = new Date(date - tzoffset).toISOString().slice(0, -1);
+    return localISOString;
 }

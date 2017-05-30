@@ -63,16 +63,7 @@
 	"change_pswd": "Change Password",
 
 	/*Profile*/
-	"update": "Update",
-
-	/*Posts*/
-
-	"postTitle": "Title",
-	"postContent": "Content",
-	"postPicture": "Picture",
-	// "uploadLabel": "Choose File"
-	"profilePicture": "Profile Picture"
-
+	"update": "Update"
 
 	
 

@@ -10,7 +10,7 @@ Template.calender.onCreated(function () {
             Tracker.autorun(function () {
 
                 //check whether a new reservation is added, a reactive display (real-time)
-                if (previousReservationsCount != 0 && previousReservationsCount !== Reservations.find().count()) {
+                if (previousReservationsCount != 0 && previousReservationsCount < Reservations.find().count()) {
 
                     let newReservation = Reservations.findOne({}, {
                         sort: {
@@ -61,7 +61,6 @@ Template.calender.onRendered(() => {
     $('#gotodate-datepicker').datepicker();
 });
 
-
 function showReservations() {
 
     console.log('showReservations');
@@ -80,9 +79,11 @@ function showReservations() {
             statusColor = 'blue'
         }
 
+        let targetedCenter = Centers.findOne(targetedRoom.center);
+
         reservations.push({
             id: reservation._id,
-            resourceId: targetedRoom._id,
+            resourceId: targetedCenter.name + " - " + targetedRoom.description,
             title: reservation.status,
             start: reservation.startDateTime,
             end: reservation.endDateTime,
@@ -91,16 +92,26 @@ function showReservations() {
         })
     })
 
+    //refresh use, create after destroy
     $('#myCalendar').fullCalendar('destroy');
     $('#myCalendar').fullCalendar({
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-        defaultView: 'timelineDay',
-        aspectRatio: 6,
+        defaultView: 'agendaDay',
+        aspectRatio: 2,
         header: {
-            left: 'prev,next today goToDateButton',
+            left: 'prev,next today customButton_NewReservation',
             center: 'title',
-            right: '',
+            right: 'agendaDay,timelineDay',
         },
+        customButtons: {
+            customButton_NewReservation: {
+                text: '建立預約',
+                click: function () {
+                    window.open('admin/Reservations/new');
+                }
+            }
+        },
+
         events: reservations,
         eventClick: function (calEvent, jsEvent, view) {
             window.open('admin/Reservations/' + calEvent.id + '/edit');
@@ -125,7 +136,7 @@ function showReservations() {
                 let targetedCenter = Centers.findOne(room.center);
 
                 roomOptions.push({
-                    id: room._id,
+                    id: targetedCenter.name + " - " + room.description,
                     center: targetedCenter.name,
                     room: room.description
                 })
@@ -137,6 +148,23 @@ function showReservations() {
         }
         // other options go here...
     });
+
+    //Change the text of buttons which are used to switch to different views
+
+    var todayButtons = document.getElementsByClassName("fc-today-button");
+    if (todayButtons.length > 0) {
+        todayButtons[0].innerText = "顯示今天預約"
+    }
+
+    var agendaDayButtons = document.getElementsByClassName("fc-agendaDay-button");
+    if (agendaDayButtons.length > 0) {
+        agendaDayButtons[0].innerText = "Agenda View"
+    }
+
+    var timelineDayButtons = document.getElementsByClassName("fc-timelineDay-button");
+    if (timelineDayButtons.length > 0) {
+        timelineDayButtons[0].innerText = "Timeline View"
+    }
 }
 
 function playNotifySound() {
