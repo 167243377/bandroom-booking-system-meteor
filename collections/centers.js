@@ -48,14 +48,17 @@ Schemas.Centers = new SimpleSchema({
   },
   location: {
     type: Object,
+    label: "地圖位置(請在地圖上點擊)",
     optional: true,
     autoform: {
       type: 'map',
-      lable: "地圖",
       afFieldInput: {
         key: 'AIzaSyBA0f2XF7LxvhS-8ZZZtlex40s9fV8pw_0',
-        zoom: 8,
-        geolocation: true
+        language: 'zh-hk',
+        zoom: 17,
+        defaultZoom: 11,
+        defaultLat: 22.3724857,
+        defaultLng: 114.1878152
       }
     }
   },
