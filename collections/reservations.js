@@ -98,7 +98,7 @@ Schemas.Reservations = new SimpleSchema({
 
                         if (startDateTime >= currentNonAvailablePeriodStartDate && startDateTime <= currentNonAvailablePeriodEndDate) {
                             console.log('this period cannot be booked');
-                            return "nonAvailableBookingPeriod";
+                            return "nonAvailableBookingDay";
                         }
                     }
                 }
@@ -259,7 +259,7 @@ Schemas.Reservations = new SimpleSchema({
 
                         if (endDateTime >= currentNonAvailablePeriodStartDate && endDateTime <= currentNonAvailablePeriodEndDate) {
                             console.log('this period cannot be booked');
-                            return "nonAvailableBookingPeriod";
+                            return "nonAvailableBookingDay";
                         }
                     }
                 }
@@ -405,11 +405,12 @@ SimpleSchema.messages({
     "dateTimeMustbeIn15MintuesTimeSlot": "時間必需以15分鐘為單位",
     "dateTimeOverlap": "預約時間重疊",
     "phoneNoLengthIsNot8": "聯絡電話號碼長度必需為8位數字",
-    "nonAvailableBookingPeriod": "已選擇的日子為暫停預約",
+    "nonAvailableBookingPeriod": "已選擇的日子為暫停預約日",
     "atleastBook30Mins": "最少預約時間為30分鐘",
-    "overlapReservationPeriod": "重疊預約時間",
-    "isNotBusinessDay": "預約日子不是營業日",
-    "isNotBusinessHours": "預約時間不是營業時間"
+    "overlapReservationPeriod": "已選擇的時間與其他預約時間重疊",
+    "nonAvailableBookingDay": "已選擇的日子為暫停預約",
+    "isNotBusinessDay": "已選擇的日子不是營業日",
+    "isNotBusinessHours": "已選擇的時間不是營業時間"
 });
 
 Reservations.attachSchema(Schemas.Reservations);
