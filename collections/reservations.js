@@ -1,7 +1,5 @@
 this.Reservations = new Mongo.Collection('reservations');
 
-SimpleSchema.debug = true
-
 Schemas.Reservations = new SimpleSchema({
     room: {
         type: String,
@@ -50,8 +48,65 @@ Schemas.Reservations = new SimpleSchema({
                 return "dateTimeMustbeIn15MintuesTimeSlot";
             }
 
-            //Rules #2: check whether the room has non available booking period
+            //Rules #2.1 check whether the booking day is the buiness day of selected center
+            var selectedRoomCenter = Centers.findOne(selectedRoom.center);
+
+            var weekDayLetter = convertWeekDayNumberToLetter(startDateTime.getDay());
+
+            var selectedWeekDay;
+            
+            selectedRoomCenter.businessHours.filter((businessDays) =>{
+                selectedWeekDay = businessDays[weekDayLetter];
+            });
+
+            if(selectedWeekDay.isOpen === false){
+                return "isNotBusinessDay";
+            }
+
+            if(selectedWeekDay.startTime !== undefined && selectedWeekDay.endTime !== undefined){
+
+                var bookedStartTime = new Date();
+                bookedStartTime.setHours(startDateTime.getHours(),startDateTime.getMinutes(),0,0);
+
+                var businessHoursStartTime = new Date();
+                businessHoursStartTime.setHours(selectedWeekDay.startTime.split(':')[0],selectedWeekDay.startTime.split(':')[1],0,0);
+                // var businessHoursEndTime = new Date();
+                // businessHoursEndTime.setHours(selectedWeekDay.endTime.split(':')[0],selectedWeekDay.endTime.split(':')[1],0,0);
+
+                //Rules #2.2 check whether the booking day is the buiness hour of selected center
+                if(bookedStartTime < businessHoursStartTime){ //|| bookedStartTime > businessHoursEndTime){
+                    console.log('bookedStartTime < buinessHoursStartTime');
+                    return "isNotBusinessHours";
+                }
+            }
+
+            if (selectedRoomCenter.nonAvailablePeriod !== undefined) {
+                if (selectedRoomCenter.nonAvailablePeriod.length > 0) {
+                     startDateTime = new Date(this.value);
+
+                    for (var i = 0; i < selectedRoomCenter.nonAvailablePeriod.length; i++) {
+
+                        var currentNonAvailablePeriod = selectedRoomCenter.nonAvailablePeriod[i];
+
+                        var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
+                        var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
+
+                        //setHours to 0, we just compare the date only
+                        currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
+                        currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
+                        startDateTime.setHours(0, 0, 0, 0);
+
+                        if (startDateTime >= currentNonAvailablePeriodStartDate && startDateTime <= currentNonAvailablePeriodEndDate) {
+                            console.log('this period cannot be booked');
+                            return "nonAvailableBookingPeriod";
+                        }
+                    }
+                }
+            }
+
+            //Rules #3: check whether the room has non available booking period
             if (selectedRoom.nonAvailablePeriod !== undefined) {
+                startDateTime = new Date(this.value);
                 if (selectedRoom.nonAvailablePeriod.length > 0) {
 
                     for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
@@ -75,14 +130,17 @@ Schemas.Reservations = new SimpleSchema({
                 }
             }
 
-            //Rules #3: check whether the room have already been booked.
+
+            //Rules #4: check whether the room have already been booked.
+            startDateTime = new Date(this.value);
             var localISOString = toLocaleISOString(startDateTime);
 
             var overlapReservation = Reservations.find({
                 room: selectedRoom._id,
                 status: { $in: ["To Be Started", "Closed"] },
                 startDateTime: { $lte: localISOString },
-                endDateTime: { $gt: localISOString }
+                endDateTime: { $gt: localISOString },
+                _id: { $ne: this.docId }
             }).fetch()
 
             if (overlapReservation.length > 0) {
@@ -97,6 +155,10 @@ Schemas.Reservations = new SimpleSchema({
             type: 'datetime-local'
         },
         custom: function () {
+
+            if (Meteor.isClient) {
+                Meteor.subscribe('reservations');
+            }
 
             var startDateTime = new Date(this.field('startDateTime').value);
             var endDateTime = new Date(this.value);
@@ -121,9 +183,95 @@ Schemas.Reservations = new SimpleSchema({
                 return "atleastBook30Mins";
             }
 
-            //Rules #4: check whether the room has non available booking period
+
+            //Rules #4.1 check whether the booking day is the buiness day of selected center
+            if (Meteor.isClient) {
+            var selectedRoomCenter = Centers.findOne(selectedRoom.center);
+
+            if(startDateTime.getDate() === endDateTime.getDate()){
+
+                var weekDayLetter = convertWeekDayNumberToLetter(startDateTime.getDay());
+            
+                var selectedWeekDay;
+            
+                selectedRoomCenter.businessHours.filter((businessDays) =>{
+                    selectedWeekDay = businessDays[weekDayLetter];
+                });
+
+                if(selectedWeekDay.isOpen === false){
+                    return "isNotBusinessDay";
+                }
+
+                var bookedEndTime = new Date();
+                bookedEndTime.setHours(endDateTime.getHours(),endDateTime.getMinutes(),0,0);
+
+                // var businessHoursStartTime = new Date();
+                // businessHoursStartTime.setHours(selectedWeekDay.startTime.split(':')[0],selectedWeekDay.startTime.split(':')[1],0,0);
+                var businessHoursEndTime = new Date();
+                businessHoursEndTime.setHours(selectedWeekDay.endTime.split(':')[0],selectedWeekDay.endTime.split(':')[1],0,0);
+
+                //Rules #4.2 check whether the booking day is the buiness hour of selected center
+                if(bookedEndTime > businessHoursEndTime && businessHoursEndTime.getHours() !== 0){
+                    return "isNotBusinessHours";
+                }
+            }else{
+                var weekDayLetter = convertWeekDayNumberToLetter(endDateTime.getDay());
+            
+                var selectedWeekDay;
+            
+                selectedRoomCenter.businessHours.filter((businessDays) =>{
+                    selectedWeekDay = businessDays[weekDayLetter];
+                });
+                if(selectedWeekDay.isOpen === false){
+                    return "isNotBusinessDay";
+                }
+
+                var bookedEndTime = new Date();
+                bookedEndTime.setHours(endDateTime.getHours(),endDateTime.getMinutes(),0,0);
+
+                var businessHoursStartTime = new Date();
+                businessHoursStartTime.setHours(selectedWeekDay.startTime.split(':')[0],selectedWeekDay.startTime.split(':')[1],0,0);
+
+                //Rules #4.2 check whether the booking day is the buiness hour of selected center
+                if(bookedEndTime < businessHoursStartTime){
+
+                    //02:00 < 01:00 ==> false, cannot be booked.
+                    return "isNotBusinessHours";
+                }
+            }
+
+            if (selectedRoomCenter.nonAvailablePeriod !== undefined) {
+                if (selectedRoomCenter.nonAvailablePeriod.length > 0) {
+
+                    endDateTime = new Date(this.value);
+
+                    for (var i = 0; i < selectedRoomCenter.nonAvailablePeriod.length; i++) {
+
+                        var currentNonAvailablePeriod = selectedRoomCenter.nonAvailablePeriod[i];
+
+                        var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
+                        var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
+
+                        //setHours to 0, we just compare the date only
+                        currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
+                        currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
+                        endDateTime.setHours(0, 0, 0, 0);
+
+                        if (endDateTime >= currentNonAvailablePeriodStartDate && endDateTime <= currentNonAvailablePeriodEndDate) {
+                            console.log('this period cannot be booked');
+                            return "nonAvailableBookingPeriod";
+                        }
+                    }
+                }
+            }
+
+            }
+
+            //Rules #4.3: check whether the room has non available booking period
             if (selectedRoom.nonAvailablePeriod !== undefined) {
                 if (selectedRoom.nonAvailablePeriod.length > 0) {
+
+                    endDateTime = new Date(this.value);
 
                     for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
 
@@ -146,13 +294,15 @@ Schemas.Reservations = new SimpleSchema({
             }
 
             //Rules #5: check whether the room have already been booked.
+            endDateTime = new Date(this.value);
             var localISOString = toLocaleISOString(endDateTime);
 
             var overlapReservation = Reservations.find({
                 room: selectedRoom._id,
                 status: { $in: ["To Be Started", "Closed"] },
                 startDateTime: { $lt: localISOString },
-                endDateTime: { $gte: localISOString }
+                endDateTime: { $gte: localISOString },
+                _id: { $ne: this.docId }
             }).fetch()
 
             if (overlapReservation.length > 0) {
@@ -257,7 +407,9 @@ SimpleSchema.messages({
     "phoneNoLengthIsNot8": "聯絡電話號碼長度必需為8位數字",
     "nonAvailableBookingPeriod": "已選擇的日子為暫停預約",
     "atleastBook30Mins": "最少預約時間為30分鐘",
-    "overlapReservationPeriod": "重疊預約時間"
+    "overlapReservationPeriod": "重疊預約時間",
+    "isNotBusinessDay": "預約日子不是營業日",
+    "isNotBusinessHours": "預約時間不是營業時間"
 });
 
 Reservations.attachSchema(Schemas.Reservations);
@@ -329,4 +481,17 @@ function toLocaleISOString(date) {
     var tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
     var localISOString = new Date(date - tzoffset).toISOString().slice(0, -1);
     return localISOString;
+}
+function convertWeekDayNumberToLetter(weekdayNumber){
+    var weekday = [];
+    weekday[0] = "sunday";
+    weekday[1] = "monday";
+    weekday[2] = "tuesday";
+    weekday[3] = "wednesday";
+    weekday[4] = "thursday";
+    weekday[5] = "friday";
+    weekday[6] = "saturday";
+
+   return weekday[weekdayNumber];
+
 }

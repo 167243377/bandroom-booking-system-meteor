@@ -4,8 +4,8 @@
   "description": "BandRoom Booking System (Backend) built with Meteor",
   "main": "index.js",
   "dependencies": {
-    "bcrypt": "^1.0.2",
     "babel-runtime": "^6.23.0",
+    "bcrypt": "^1.0.2",
     "chart.js": "^2.5.0"
   },
   "devDependencies": {},

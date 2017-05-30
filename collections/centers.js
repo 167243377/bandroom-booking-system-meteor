@@ -15,10 +15,7 @@ Schemas.Centers = new SimpleSchema({
     type: String,
     label: '聯絡電話',
     max: 8,
-    min: 8,
-    custom: function () {
-      console.log(this.field('contactNumber'));
-    }
+    min: 8
   },
   contactEmail: {
     type: String,
@@ -86,6 +83,7 @@ Schemas.Centers = new SimpleSchema({
   "businessHours.$.sunday.startTime": {
     type: String,
     label: '開門時間',
+    optional: true,
     autoform: {
       type: 'time'
     }
@@ -93,6 +91,7 @@ Schemas.Centers = new SimpleSchema({
   "businessHours.$.sunday.endTime": {
     type: String,
     label: '關門時間',
+    optional: true,
     autoform: {
       type: 'time'
     }
@@ -106,12 +105,20 @@ Schemas.Centers = new SimpleSchema({
     label: '營業天'
   },
   "businessHours.$.monday.startTime": {
-    type: Boolean,
-    label: '開門時間'
+    type: String,
+    label: '開門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.monday.endTime": {
-    type: Boolean,
-    label: '關門時間'
+    type: String,
+    label: '關門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.tuesday": {
     type: Object,
@@ -122,12 +129,20 @@ Schemas.Centers = new SimpleSchema({
     label: '營業天'
   },
   "businessHours.$.tuesday.startTime": {
-    type: Boolean,
-    label: '開門時間'
+    type: String,
+    label: '開門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.tuesday.endTime": {
-    type: Boolean,
-    label: '關門時間'
+    type: String,
+    label: '關門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.wednesday": {
     type: Object,
@@ -138,12 +153,20 @@ Schemas.Centers = new SimpleSchema({
     label: '營業天'
   },
   "businessHours.$.wednesday.startTime": {
-    type: Boolean,
-    label: '開門時間'
+    type: String,
+    label: '開門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.wednesday.endTime": {
-    type: Boolean,
-    label: '關門時間'
+    type: String,
+    label: '關門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.thursday": {
     type: Object,
@@ -154,12 +177,20 @@ Schemas.Centers = new SimpleSchema({
     label: '營業天'
   },
   "businessHours.$.thursday.startTime": {
-    type: Boolean,
-    label: '開門時間'
+    type: String,
+    label: '開門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.thursday.endTime": {
-    type: Boolean,
-    label: '關門時間'
+    type: String,
+    label: '關門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.friday": {
     type: Object,
@@ -170,12 +201,20 @@ Schemas.Centers = new SimpleSchema({
     label: '營業天'
   },
   "businessHours.$.friday.startTime": {
-    type: Boolean,
-    label: '開門時間'
+    type: String,
+    label: '開門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.friday.endTime": {
-    type: Boolean,
-    label: '關門時間'
+    type: String,
+    label: '關門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.saturday": {
     type: Object,
@@ -186,12 +225,33 @@ Schemas.Centers = new SimpleSchema({
     label: '營業天'
   },
   "businessHours.$.saturday.startTime": {
-    type: Boolean,
-    label: '開門時間'
+    type: String,
+    label: '開門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
   },
   "businessHours.$.saturday.endTime": {
-    type: Boolean,
-    label: '關門時間'
+    type: String,
+    label: '關門時間',
+    optional: true,
+    autoform: {
+      type: 'time'
+    }
+  },
+  nonAvailablePeriod: {
+    type: [Object],
+    label: "暫停營業時間",
+    optional: true
+  },
+  "nonAvailablePeriod.$.startDate": {
+    type: Date,
+    label: "開始時間"
+  },
+  "nonAvailablePeriod.$.endDate": {
+    type: Date,
+    label: "完結時間"
   },
   createdAt: {
     type: Date,

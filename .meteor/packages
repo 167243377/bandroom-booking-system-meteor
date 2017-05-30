@@ -24,7 +24,6 @@ iron:router
 yogiben:autoform-modals
 yogiben:pretty-email
 yogiben:autoform-file
-yogiben:autoform-map
 multiply:iron-router-progress
 manuelschoebel:ms-seo
 spiderable
@@ -53,7 +52,6 @@ percolate:momentum
 natestrauser:animate-css
 meteorhacks:subs-manager
 fastclick@1.0.13
-yogiben:admin
 timmyg:wow
 tsega:skrollr
 utilities:avatar
@@ -85,3 +83,5 @@ reactive-var
 reactive-dict
 brentjanderson:buzz
 maazalik:highcharts-3d
+yogiben:admin
+yogiben:autoform-map
