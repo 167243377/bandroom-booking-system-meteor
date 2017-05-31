@@ -101,7 +101,7 @@ function showReservations() {
         header: {
             left: 'prev,next today customButton_NewReservation',
             center: 'title',
-            right: 'agendaDay,timelineDay',
+            right: 'agendaDay,timelineDay,basicWeek,month',
         },
         customButtons: {
             customButton_NewReservation: {
@@ -165,6 +165,17 @@ function showReservations() {
     if (timelineDayButtons.length > 0) {
         timelineDayButtons[0].innerText = "Timeline View"
     }
+
+    var weekButtons = document.getElementsByClassName("fc-basicWeek-button");
+    if (weekButtons.length > 0) {
+        weekButtons[0].innerText = "Week View"
+    }
+
+    var monthButtons = document.getElementsByClassName("fc-month-button");
+    if (monthButtons.length > 0) {
+        monthButtons[0].innerText = "Month View"
+    }
+
 }
 
 function playNotifySound() {
