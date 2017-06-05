@@ -2068,6 +2068,10 @@
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/lib/async.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/support/sync-package-managers.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/lru-cache/lib/lru-cache.js" />
+        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/js/jquery.dataTables.js" />
+        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/js/jquery.dataTables.min.js" />
+        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/css/jquery.dataTables.css" />
+        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/css/jquery.dataTables.min.css" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/cfs_data-man/0.0.6/npm/node_modules/mime/mime.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/cfs_data-man/0.0.6/npm/node_modules/mime/test.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/cfs_data-man/0.0.6/npm/node_modules/temp/lib/temp.js" />
@@ -4078,10 +4082,6 @@
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/promise/0.8.8/npm/node_modules/meteor-promise/promise_client.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/promise/0.8.8/npm/node_modules/meteor-promise/promise.d.ts" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/promise/0.8.8/npm/node_modules/meteor-promise/fiber_pool.js" />
-        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/js/jquery.dataTables.min.js" />
-        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/js/jquery.dataTables.js" />
-        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/css/jquery.dataTables.min.css" />
-        <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/css/jquery.dataTables.css" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/spacebars-compiler/1.1.1/npm/node_modules/cliui/index.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/spacebars-compiler/1.1.1/npm/node_modules/async/lib/async.js" />
         <item url="file://$USER_HOME$/AppData/Local/.meteor/packages/spacebars-compiler/1.1.1/npm/node_modules/yargs/index.js" />
@@ -7283,6 +7283,10 @@
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/lib/async.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/async/support/sync-package-managers.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/caching-compiler/1.1.9/npm/node_modules/lru-cache/lib/lru-cache.js" />
+      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/js/jquery.dataTables.js" />
+      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/js/jquery.dataTables.min.js" />
+      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/css/jquery.dataTables.css" />
+      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.4.2/npm/node_modules/datatables/media/css/jquery.dataTables.min.css" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/cfs_data-man/0.0.6/npm/node_modules/mime/mime.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/cfs_data-man/0.0.6/npm/node_modules/mime/test.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/cfs_data-man/0.0.6/npm/node_modules/temp/lib/temp.js" />
@@ -9293,10 +9297,6 @@
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/promise/0.8.8/npm/node_modules/meteor-promise/promise_client.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/promise/0.8.8/npm/node_modules/meteor-promise/promise.d.ts" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/promise/0.8.8/npm/node_modules/meteor-promise/fiber_pool.js" />
-      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/js/jquery.dataTables.min.js" />
-      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/js/jquery.dataTables.js" />
-      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/css/jquery.dataTables.min.css" />
-      <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/aldeed_tabular/1.6.0/npm/node_modules/datatables/media/css/jquery.dataTables.css" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/spacebars-compiler/1.1.1/npm/node_modules/cliui/index.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/spacebars-compiler/1.1.1/npm/node_modules/async/lib/async.js" />
       <root url="file://$USER_HOME$/AppData/Local/.meteor/packages/spacebars-compiler/1.1.1/npm/node_modules/yargs/index.js" />
