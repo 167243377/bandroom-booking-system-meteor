@@ -516,9 +516,12 @@ Rooms.helpers({
 
 if(Meteor.isServer){
     var Api = new Restivus({
-        useDefaultAuth: true,
-        prettyJson: true
-    });
+        prettyJson: true,
+        defaultHeaders: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+    }); 
 
-    // Api.addCollection(Rooms);
+    Api.addCollection(Rooms);
 }

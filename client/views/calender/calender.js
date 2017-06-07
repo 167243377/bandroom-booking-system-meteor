@@ -2,6 +2,8 @@ Template.calender.onCreated(function () {
     var isRefresh = false;
     var previousReservationsCount = 0;
 
+    var previousRservationId = "";
+
     var self = this;
     self.autorun(function () {
         self.subscribe("rooms");
@@ -14,7 +16,7 @@ Template.calender.onCreated(function () {
 
                     let newReservation = Reservations.findOne({}, {
                         sort: {
-                            DateTime: -1,
+                            createdAt: -1,
                             limit: 1
                         }
                     });
@@ -28,9 +30,9 @@ Template.calender.onCreated(function () {
                         alert('有一個新預約' + '\n' +
                             "房間: " + newReservationCenter.name + " - " + newReservationRoom.description + '\n' +
                             '預約時間: ' + formatDate(newReservation.startDateTime) + ' - ' + formatDate(newReservation.endDateTime));
+                        return false;
                     }, 1000);
                     //Timeout makes asynchronous
-
                 }
 
                 showReservations();
@@ -107,14 +109,14 @@ function showReservations() {
             customButton_NewReservation: {
                 text: '建立預約',
                 click: function () {
-                    window.open('admin/Reservations/new');
+                    window.open('http://localhost:3000/admin/Reservations/new');
                 }
             }
         },
 
         events: reservations,
         eventClick: function (calEvent, jsEvent, view) {
-            window.open('admin/Reservations/' + calEvent.id + '/edit');
+            window.open('http://localhost:3000/admin/Reservations/' + calEvent.id + '/edit');
         },
         resourceColumns: [{
                 labelText: '中心',
@@ -193,5 +195,5 @@ function formatDate(date) {
     hours = hours ? hours : 12; // the hour '0' should be '12'
     minutes = minutes < 10 ? '0' + minutes : minutes;
     var strTime = hours + ':' + minutes + ' ' + ampm;
-    return inputDate.getMonth() + "/" + inputDate.getDate() + "  " + strTime;
+    return inputDate.getMonth() + 1 + "/" + inputDate.getDate() + "  " + strTime;
 }

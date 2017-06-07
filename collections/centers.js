@@ -323,3 +323,15 @@ function isValidTimeFormat(timeValue) {
 
     return isVaild;
 }
+
+if(Meteor.isServer){
+    var Api = new Restivus({
+        prettyJson: true,
+        defaultHeaders: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+    }); 
+
+    Api.addCollection(Centers);
+}

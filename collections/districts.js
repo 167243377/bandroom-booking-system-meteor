@@ -65,10 +65,12 @@ Districts.helpers({
 // /api/districts
 
 if (Meteor.isServer) {
-	var Api = new Restivus({
-		useDefaultAuth: true,
-		prettyJson: true
-	});
-
+    var Api = new Restivus({
+        prettyJson: true,
+        defaultHeaders: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+    }); 
 	Api.addCollection(Districts);
 }
