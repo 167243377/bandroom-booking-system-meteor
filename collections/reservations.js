@@ -538,7 +538,7 @@ if(Meteor.isServer){
 
             console.log(selectedRoom.owner);
 
-            var createdRecord = Reservations.insert({
+            var createdRecordId = Reservations.insert({
                 "room": bodyParams.room,
                 "startDateTime": bodyParams.startDateTime,
                 "endDateTime": bodyParams.endDateTime,
@@ -552,8 +552,69 @@ if(Meteor.isServer){
 
             return {
                 status: 'success',
-                data: createdRecord
+                data: createdRecordId
             };
         }
     });
+
+    Api.addRoute('reservations/:id', {
+        get: function(){
+            var reservationId = this.urlParams.id;
+
+            var reservation = Reservations.findOne(reservationId);
+            var room = Rooms.findOne(reservation.room);
+            var center = Centers.findOne(room.center);
+
+            //inputted value already used the local timezone. Thus, we have to get the UTC hours
+            var startDateTime = new Date(reservation.startDateTime).toUTCTime();
+            var endDateTime =  new Date(reservation.endDateTime).toUTCTime();
+
+            var reservationData = {
+                room:{
+                    center:{
+                        name: center.name
+                    },
+                    description: room.description,
+                },
+                bookingData:{
+                    bookDate: new Date(reservation.startDateTime).toUTCDate(),
+                    startDateTime: startDateTime,
+                    endDateTime: endDateTime,
+                    contactName: reservation.contactName, // optional field
+                    phoneNo: reservation.phoneNo,
+                    people: reservation.people == "" ? 0: reservation.people  // optional field
+                }
+            }
+
+            return {
+                status: 'success',
+                data: reservationData  
+            }
+
+        }
+    })
 }
+
+Date.prototype.toUTCDate = function() {
+  var yyyy = this.getFullYear();
+
+  var mm = this.getMonth();
+  mm = (mm>9 ? '' : '0') + mm;
+  // append leading zero
+
+  var dd = this.getDay();
+  dd = (dd>9 ? '' : '0') + dd
+  // append leading zero
+
+  return yyyy + '-' + mm + '-' + dd;
+};
+
+Date.prototype.toUTCTime = function() {
+  var mm = this.getUTCHours();
+  var dd = this.getUTCMinutes();
+
+  return [(mm>9 ? '' : '0') + mm +
+           ':'+ 
+          (dd>9 ? '' : '0') + dd
+         ].join('');
+};

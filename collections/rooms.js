@@ -523,5 +523,39 @@ if(Meteor.isServer){
         },
     }); 
 
-    Api.addCollection(Rooms);
+    Api.addRoute('rooms', {
+        post: function() {
+            var bodyParams = this.bodyParams;
+            console.log(bodyParams);
+
+            var district = Districts.findOne({
+                code: bodyParams.districtCode
+            })
+
+            console.log(district);
+
+            var centers = Centers.find({
+                district: district._id
+            }).fetch();
+
+            var centerIds = [];
+
+            centers.map((center) => {
+                centerIds.push(center._id);
+            })
+
+            console.log(centerIds);
+
+            var rooms = Rooms.find({
+                center: { $in: centerIds }
+            })
+
+            console.log(rooms);
+
+            return {
+                status: 'success',
+                data: rooms
+            }
+        }
+    });
 }
