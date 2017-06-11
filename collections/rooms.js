@@ -310,32 +310,20 @@ Schemas.Rooms = new SimpleSchema({
 
 
                 });
-
             }
-
         }
-
     },
 
 
     "nonAvailablePeriod.$.startDate": {
-
-
         type: Date,
-
         label: "開始時間"
-
-
     },
 
 
     "nonAvailablePeriod.$.endDate": {
-
         type: Date,
-
         label: "完結時間"
-
-
     },
 
     createdAt: {
@@ -514,48 +502,192 @@ Rooms.helpers({
 
 });
 
-if(Meteor.isServer){
+if (Meteor.isServer) {
     var Api = new Restivus({
         prettyJson: true,
         defaultHeaders: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         },
-    }); 
+    });
 
     Api.addRoute('rooms', {
-        post: function() {
+        post: function () {
+
+            var allRooms = Rooms.find().fetch();
+
             var bodyParams = this.bodyParams;
             console.log(bodyParams);
 
-            var district = Districts.findOne({
-                code: bodyParams.districtCode
+            var searchResultRooms = [];
+
+            allRooms.forEach(currentRoom => {
+                var currentRoomRoomType = RoomTypes.findOne(currentRoom.roomType);
+                var currentRoomCenter = Centers.findOne(currentRoom.center);
+                var currentRoomDistrict = Districts.findOne(currentRoomCenter.district);
+
+                // { districtCode: string,                                                                                                                                                                                    
+                //   roomTypeCode: string,                                                                                                                                                                                      
+                //   people: number,                                                                                                                                                                                            
+                //   searchDate: string ,                                                                                                                                                                                        
+                //   priceRange: { lower: integer, upper: integer },                                                                                                                                                                  
+                //   canUseAsTeaching: boolean
+                //   keyboardRequired: boolean }  
+
+                console.log('current Room');
+                console.log(currentRoom);
+
+                if (!isNullOrEmpty(bodyParams.districtCode)) {
+                    var searchDistrict = Districts.findOne({
+                        code: bodyParams.districtCode
+                    })
+
+                    if (currentRoomDistrict._id !== searchDistrict._id) {
+                        console.log('return in district')
+                        return;
+                    }
+                }
+
+                if (!isNullOrEmpty(bodyParams.roomTypeCode)) {
+                    var searchRoomType = RoomTypes.findOne({
+                        code: bodyParams.roomTypeCode
+                    })
+
+                    if (currentRoomRoomType._id !== searchRoomType._id) {
+                        console.log('return in roomTypeCode')
+                        return;
+                    }
+                }
+
+                if (!isNullOrEmpty(bodyParams.people)) {
+                    if (Number(bodyParams.people) > currentRoom.people) {
+                        console.log('return in people')
+                        return;
+                    }
+                }
+
+                if (currentRoom.price < Number(bodyParams.priceRange.lower)) {
+                    console.log('return in priceRange lower')
+                    return;
+                }// 100 < 50 = false (OK), 30 < 50 = true (Not OK)
+
+                if (currentRoom.price > Number(bodyParams.priceRange.upper)) {
+                    console.log('return in priceRange upper')
+                    return;
+                }
+
+                if (bodyParams.canUseAsTeaching) {
+                    if (!currentRoom.canTeach) {
+                        console.log('return in canUseAsTeaching')
+                        return;
+                    }
+                }
+
+                if (bodyParams.keyboardRequired) {
+                    if (!currentRoom.hasKeyboard) {
+                        console.log('return in keyboardRequired')
+                        return;
+                    }
+                }
+
+
+                var images = [];
+
+                if (!isNullOrEmpty(currentRoom.images)) {
+                    console.log(currentRoom.images);
+
+                    currentRoom.images.forEach(image => {
+                        images.push(image.toString('base64'));
+                    })
+                }
+
+                var searchResultRoom = {
+                    id: currentRoom._id,
+                    districtDescription: currentRoomDistrict.description,
+                    roomTypeDescription: currentRoomRoomType.description,
+                    price: currentRoom.price,
+                    images: images
+                }
+
+                console.log('pushed');
+                searchResultRooms.push(searchResultRoom);
             })
 
-            console.log(district);
+            console.log('after forEach');
+            console.log(searchResultRooms);
 
-            var centers = Centers.find({
-                district: district._id
-            }).fetch();
 
-            var centerIds = [];
+            // if (false) {
 
-            centers.map((center) => {
-                centerIds.push(center._id);
-            })
+            //     /////////////////////////////////////////////
 
-            console.log(centerIds);
+            //     if (bodyParams.districtCode) {
+            //         //search by district
+            //         var district = Districts.findOne({
+            //             code: bodyParams.districtCode
+            //         })
 
-            var rooms = Rooms.find({
-                center: { $in: centerIds }
-            })
+            //         var centers = Centers.find({
+            //             district: district._id
+            //         }).fetch();
 
-            console.log(rooms);
+            //         // if there is any centers found in this district
+            //         if (centers.length > 0) {
+
+            //             var centerIds = [];
+
+            //             for (var i = 0; i < centers.length; i++) {
+            //                 centerIds.push(centers[i]._id);
+            //             }
+
+            //             console.log(centerIds);
+
+            //             roomCursor = roomCursor.find({
+            //                 center: { $in: centerIds }
+            //             })
+
+            //             // console.log('rooms');
+            //             // console.log(rooms);
+
+            //             // rooms.forEach((room) => {
+            //             //     resultRooms.push(room);
+            //             // });
+            //         }
+            //     }
+
+            //     var searchResultRooms = [];
+
+            //     // all filtered rooms are here, loop into an arrary, then return 
+            //     roomCursor.fetch().forEach(room => {
+            //         searchResultRooms.push(room);
+            //     });
+            // }
 
             return {
                 status: 'success',
-                data: rooms
+                data: JSON.stringify(searchResultRooms)
             }
         }
     });
+
+    Api.addRoute('rooms/:id', {
+        get: function () {
+            var roomId = this.urlParams.id;
+
+            var room = Rooms.findOne(roomId);
+
+        }
+    })
+}
+
+function isNullOrEmpty(str) {
+    if (str == null || str == undefined) {
+        return true;
+    }
+
+    if (str == "") {
+        return true;
+    }
+
+    return false;
 }

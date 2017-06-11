@@ -89,7 +89,7 @@ Attachments.allow({
   update: function (userId, doc, fieldNames, modifier) {
     return true;
   },
-  download: function (userId) {
+  download: function () {
     return true;
   }
 });
