@@ -668,13 +668,98 @@ if (Meteor.isServer) {
                 data: JSON.stringify(searchResultRooms)
             }
         }
-    });
+    })
 
     Api.addRoute('rooms/:id', {
         get: function () {
             var roomId = this.urlParams.id;
 
             var room = Rooms.findOne(roomId);
+            var center = Centers.findOne(room.center);
+            var district = Districts.findOne(center.district);
+            var roomType = RoomTypes.findOne(room.roomType);
+
+            var resultRoom = {
+                _id: roomId,
+                center: {
+                    name: center.name,
+                    address: center.address,
+                    contactNumber: center.contactNumber,
+                    district: {
+                        code: district.code,
+                        description: district.description
+                    },
+                    lat: center.location.lat,
+                    lngi: center.location.lng,
+                    nonAvailablePeriod: room.nonAvailablePeriod
+                },
+                description: room.description,
+                price: room.price,
+                images: room.images,
+                gears: room.gears,
+                roomType: {
+                    code: roomType.code,
+                    description: roomType.description
+                },
+                canTeach: room.canTeach,
+                hasKeyboard: room.hasKeyboard,
+                roomNonAvailablePeriod: room.nonAvailablePeriod,
+                businessHours: room.businessHours
+            }
+
+            return {
+                status: 'success',
+                data: JSON.stringify(resultRoom)
+            }
+
+        }
+    })
+
+    Api.addRoute('favoriteRooms', {
+        post: function () {
+            var favoriteRoomIds = this.body;
+
+            console.log(this);
+
+            console.log(favoriteRoomIds);
+
+            console.log(Array.isArray(favoriteRoomIds));
+
+            var resultRooms = [];
+
+            if (Array.isArray(favoriteRoomIds)) {
+
+                var rooms = Rooms.find(
+                    {
+                        _id: {
+                            $in: favoriteRoomIds
+                        }
+                    }
+                )
+
+                rooms.fetch().forEach(room => {
+
+
+
+                    var resultRoom = [];
+
+                    var center = Centers.findOne(room.center);
+
+                    resultRoom = {
+                        _id: room._id,
+                        centerName: center.name,
+                        images: rooms.images,
+                        description: room.description,
+                    }
+                    resultRooms.push(resultRoom);
+                })
+
+            }
+
+            return {
+                status: 'success',
+                data: JSON.stringify(resultRooms)
+            }
 
         }
     })
