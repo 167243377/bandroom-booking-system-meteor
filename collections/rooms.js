@@ -717,13 +717,11 @@ if (Meteor.isServer) {
 
     Api.addRoute('favoriteRooms', {
         post: function () {
-            var favoriteRoomIds = this.body;
 
-            console.log(this);
+            console.log('POST /api/favoriteRooms');
+            console.log(this.bodyParams);
 
-            console.log(favoriteRoomIds);
-
-            console.log(Array.isArray(favoriteRoomIds));
+            var favoriteRoomIds = this.bodyParams.favoriteRoomIds;
 
             var resultRooms = [];
 
@@ -748,7 +746,7 @@ if (Meteor.isServer) {
                     resultRoom = {
                         _id: room._id,
                         centerName: center.name,
-                        images: rooms.images,
+                        images: room.images,
                         description: room.description,
                     }
                     resultRooms.push(resultRoom);
