@@ -679,6 +679,32 @@ if (Meteor.isServer) {
             var district = Districts.findOne(center.district);
             var roomType = RoomTypes.findOne(room.roomType);
 
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            var todayISOString = toLocaleISOString(today);
+            //find all reservations for this room
+            var bookedReservations = Reservations.find({
+                room: room._id,
+                status: { $in: ["To Be Started", "Closed"] },
+                startDateTime: { $gte: todayISOString }
+            }).fetch()
+
+            console.log(bookedReservations);
+
+            var bookedPeriods = [];
+
+            bookedReservations.map(bookedReservation =>{
+                var period = {
+                    startDateTime: bookedReservation.startDateTime,
+                    endDateTime: bookedReservation.endDateTime
+                }
+
+                bookedPeriods.push(period);
+            });
+
+            console.log(bookedPeriods);
+
             var resultRoom = {
                 _id: roomId,
                 center: {
@@ -704,6 +730,7 @@ if (Meteor.isServer) {
                 canTeach: room.canTeach,
                 hasKeyboard: room.hasKeyboard,
                 roomNonAvailablePeriod: room.nonAvailablePeriod,
+                bookedPeriods: bookedPeriods,
                 businessHours: room.businessHours
             }
 
@@ -773,4 +800,10 @@ function isNullOrEmpty(str) {
     }
 
     return false;
+}
+
+function toLocaleISOString(date) {
+    var tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+    var localISOString = new Date(date - tzoffset).toISOString().slice(0, -1);
+    return localISOString;
 }

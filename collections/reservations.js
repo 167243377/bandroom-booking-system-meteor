@@ -357,7 +357,7 @@ Schemas.Reservations = new SimpleSchema({
         type: Number,
         label: '房租',
         autoValue: function () {
-            if (this.value) {
+            if (!this.value) {
                 var diffDate = (new Date(this.field('endDateTime').value) - new Date(this.field('startDateTime').value));
                 var diffHours = Math.floor((diffDate % 86400000) / 3600000);
                 var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
@@ -396,16 +396,25 @@ Schemas.Reservations = new SimpleSchema({
         regEx: SimpleSchema.RegEx.Id,
         autoValue: function () {
 
-            if (this.isServer) {
+            console.log('autoValue in');    
+
+            if (Meteor.isServer) {
+                console.log('Is server');
                 if (this.isInsert) {
+                    console.log('Is server');
                     return Meteor.userId();
                 }
             }
 
-            if (this.isClient) {
+            if (Meteor.isClient) {
+                console.log('Is Client');
+                console.log(this.userId);
                 if (this.userId) {
+                    console.log(this.userId);
+                    console.log(this.userId);
                     return this.userId;
                 } else {
+                    console.log('this.value');
                     return this.value;
                 }
             }
