@@ -124,7 +124,14 @@ Schemas.Reservations = new SimpleSchema({
                         startDateTime.setHours(0, 0, 0, 0);
 
                         if (startDateTime >= currentNonAvailablePeriodStartDate && startDateTime <= currentNonAvailablePeriodEndDate) {
-                            console.log('this period cannot be booked');
+                            console.log('this period cannot be booked 2');
+                            console.log('currentNonAvailablePeriodStartDate');
+                            console.log(currentNonAvailablePeriodStartDate);
+                            console.log('currentNonAvailablePeriodEndDate');
+                            console.log(currentNonAvailablePeriodEndDate);
+                            console.log('startDateTime');
+                            console.log(startDateTime);
+
                             return "nonAvailableBookingPeriod";
                         }
 
@@ -164,6 +171,13 @@ Schemas.Reservations = new SimpleSchema({
 
             var startDateTime = new Date(this.field('startDateTime').value);
             var endDateTime = new Date(this.value);
+
+            console.log('startDateTime');
+            console.log(startDateTime);
+
+            console.log('endDateTime');
+            console.log(endDateTime);
+
             var selectedRoom = Rooms.findOne(this.field('room').value);
 
             //Rules #1: not in a 15 mintues period
@@ -272,7 +286,7 @@ Schemas.Reservations = new SimpleSchema({
             //Rules #4.3: check whether the room has non available booking period
             if (selectedRoom.nonAvailablePeriod !== undefined) {
                 if (selectedRoom.nonAvailablePeriod.length > 0) {
-
+                    console.log(this.value);
                     endDateTime = new Date(this.value);
 
                     for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
@@ -288,7 +302,6 @@ Schemas.Reservations = new SimpleSchema({
                         endDateTime.setHours(0, 0, 0, 0);
 
                         if (endDateTime >= currentNonAvailablePeriodStartDate && endDateTime <= currentNonAvailablePeriodEndDate) {
-                            console.log('this period cannot be booked');
                             return "nonAvailableBookingPeriod";
                         }
                     }
@@ -335,7 +348,7 @@ Schemas.Reservations = new SimpleSchema({
     status: {
         type: String,
         label: '預約狀態',
-        allowedValues: ['To Be Started', 'Closed', 'Cancelled'],
+        allowedValues: [ 'To Be Started', 'Closed', 'Cancelled'],
         autoform: {
             options: [{
                 label: "To Be Started",
@@ -396,7 +409,11 @@ Schemas.Reservations = new SimpleSchema({
         regEx: SimpleSchema.RegEx.Id,
         autoValue: function () {
 
-            console.log('autoValue in');    
+            console.log('autoValue in');
+
+            if (this.value) {
+                return this.value;
+            }
 
             if (Meteor.isServer) {
                 console.log('Is server');
@@ -408,9 +425,7 @@ Schemas.Reservations = new SimpleSchema({
 
             if (Meteor.isClient) {
                 console.log('Is Client');
-                console.log(this.userId);
                 if (this.userId) {
-                    console.log(this.userId);
                     console.log(this.userId);
                     return this.userId;
                 } else {
@@ -536,7 +551,7 @@ if (Meteor.isServer) {
             var bodyParams = this.bodyParams;
             console.log(bodyParams);
 
-            var diffDate = (new Date(bodyParams.startDateTime) - new Date(bodyParams.endDateTime));
+            var diffDate = (new Date(bodyParams.endDateTime) - new Date(bodyParams.startDateTime));
             var diffHours = Math.floor((diffDate % 86400000) / 3600000);
             var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
 
@@ -545,18 +560,26 @@ if (Meteor.isServer) {
             var selectedRoom = Rooms.findOne(bodyParams.room);
             totalAmount = selectedRoom.price * (diffMintues / 60);
 
-            var createdRecordId = Reservations.insert({
+            var startDateTime = new Date(bodyParams.startDateTime);
+
+            var endDateTime =  new Date(bodyParams.endDateTime);
+
+            var newReservation = {
                 "room": bodyParams.room,
-                "startDateTime": bodyParams.startDateTime,
-                "endDateTime": bodyParams.endDateTime,
+                "startDateTime": startDateTime.toISOString(),
+                "endDateTime": endDateTime.toISOString(),
                 "phoneNo": bodyParams.phoneNo,
                 "contactName": bodyParams.contactName,
                 "status": "To Be Started",
                 "people": bodyParams.people,
                 "totalAmount": totalAmount,
-                "createdAt": toLocaleISOString(new Date()),
+                "createdAt": new Date(),
                 "owner": selectedRoom.owner
-            })
+            }
+
+            console.log(newReservation);
+
+            var createdRecordId = Reservations.insert(newReservation);
 
             return {
                 status: 'success',
@@ -626,3 +649,8 @@ Date.prototype.toUTCTime = function () {
         (dd > 9 ? '' : '0') + dd
     ].join('');
 };
+
+Date.prototype.addHours = function(h) {    
+   this.setTime(this.getTime() + (h*60*60*1000)); 
+   return this;   
+}

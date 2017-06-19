@@ -169,12 +169,7 @@ Schemas.Rooms = new SimpleSchema({
 
         type: [String],
 
-
-        optional: true,
-
-
         label: '相片',
-
 
     },
 
@@ -457,22 +452,6 @@ Rooms.helpers({
 
     },
 
-
-    roomStatusDesc: function () {
-
-
-        Meteor.subscribe('roomStatus');
-
-
-        var targetedRoomStatus = RoomStatus.findOne(this.roomStatus);
-
-
-        return targetedRoomStatus.description;
-
-
-    },
-
-
     author: function () {
 
 
@@ -603,19 +582,18 @@ if (Meteor.isServer) {
 
                 var searchResultRoom = {
                     id: currentRoom._id,
+                    description: currentRoom.description,
+                    size: currentRoom.size,
                     districtDescription: currentRoomDistrict.description,
                     roomTypeDescription: currentRoomRoomType.description,
                     price: currentRoom.price,
                     images: images
                 }
 
-                console.log('pushed');
                 searchResultRooms.push(searchResultRoom);
             })
 
-            console.log('after forEach');
             console.log(searchResultRooms);
-
 
             // if (false) {
 
@@ -694,7 +672,7 @@ if (Meteor.isServer) {
 
             var bookedPeriods = [];
 
-            bookedReservations.map(bookedReservation =>{
+            bookedReservations.map(bookedReservation => {
                 var period = {
                     startDateTime: bookedReservation.startDateTime,
                     endDateTime: bookedReservation.endDateTime
@@ -717,7 +695,8 @@ if (Meteor.isServer) {
                     },
                     lat: center.location.lat,
                     lngi: center.location.lng,
-                    nonAvailablePeriod: room.nonAvailablePeriod
+                    nonAvailablePeriod: center.nonAvailablePeriod,
+                    businessHours: center.businessHours
                 },
                 description: room.description,
                 price: room.price,
@@ -730,8 +709,7 @@ if (Meteor.isServer) {
                 canTeach: room.canTeach,
                 hasKeyboard: room.hasKeyboard,
                 roomNonAvailablePeriod: room.nonAvailablePeriod,
-                bookedPeriods: bookedPeriods,
-                businessHours: room.businessHours
+                bookedPeriods: bookedPeriods
             }
 
             return {

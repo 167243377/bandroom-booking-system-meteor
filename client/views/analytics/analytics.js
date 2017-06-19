@@ -115,7 +115,7 @@ Template.analytics.helpers({
                 type: 'column'
             },
             title: {
-                text: '最多預約次數房間'
+                text: '所有房間的預約次數'
             },
             xAxis: {
                 type: 'category'
@@ -133,15 +133,15 @@ Template.analytics.helpers({
                 series: {
                     borderWidth: 0,
                     dataLabels: {
-                        enabled: true,
-                        format: '{point.y:f} of ' + Reservations.find().fetch().length + '次'
+                        enabled: false,
+                        format: '{point.y:f}次 out of ' + Reservations.find().fetch().length + '次'
                     }
                 }
             },
 
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> of ' + Reservations.find().fetch().length + '次 <br/>'
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> out of ' + Reservations.find().fetch().length + '次 <br/>'
             },
 
             series: [{
@@ -178,7 +178,7 @@ Template.analytics.helpers({
                 type: 'pie'
             },
             title: {
-                text: '所有房間預約次數分佈'
+                text: '所有房間的預約次數分佈'
             },
             tooltip: {
                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -255,7 +255,7 @@ Template.analytics.helpers({
                 series: {
                     borderWidth: 0,
                     dataLabels: {
-                        enabled: true,
+                        enabled: false,
                         format: '{point.y:f} of $' + totalIncomeFromAllRoom
                     }
                 }
@@ -263,7 +263,7 @@ Template.analytics.helpers({
 
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> of $' + totalIncomeFromAllRoom + '<br/>'
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>${point.y:f}</b> out of $' + totalIncomeFromAllRoom + '<br/>'
             },
 
             series: [{
