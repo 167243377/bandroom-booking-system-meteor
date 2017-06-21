@@ -348,7 +348,7 @@ Schemas.Reservations = new SimpleSchema({
     status: {
         type: String,
         label: '預約狀態',
-        allowedValues: [ 'To Be Started', 'Closed', 'Cancelled'],
+        allowedValues: ['To Be Started', 'Closed', 'Cancelled'],
         autoform: {
             options: [{
                 label: "To Be Started",
@@ -562,7 +562,7 @@ if (Meteor.isServer) {
 
             var startDateTime = new Date(bodyParams.startDateTime);
 
-            var endDateTime =  new Date(bodyParams.endDateTime);
+            var endDateTime = new Date(bodyParams.endDateTime);
 
             var newReservation = {
                 "room": bodyParams.room,
@@ -602,10 +602,11 @@ if (Meteor.isServer) {
 
             var reservationData = {
                 room: {
+                    _id: room._id,
+                    description: room.description,
                     center: {
                         name: center.name
                     },
-                    description: room.description,
                 },
                 bookingData: {
                     bookDate: new Date(reservation.startDateTime).toUTCDate(),
@@ -650,7 +651,7 @@ Date.prototype.toUTCTime = function () {
     ].join('');
 };
 
-Date.prototype.addHours = function(h) {    
-   this.setTime(this.getTime() + (h*60*60*1000)); 
-   return this;   
+Date.prototype.addHours = function (h) {
+    this.setTime(this.getTime() + (h * 60 * 60 * 1000));
+    return this;
 }

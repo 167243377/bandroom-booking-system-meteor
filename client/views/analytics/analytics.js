@@ -9,10 +9,82 @@ Template.analytics.onCreated(function () {
     }
 });
 
-Template.analytics.onRendered(() => {});
+Template.analytics.onRendered(() => {
+});
 
 // myTemplate.js
 Template.analytics.helpers({
+
+    myChartData: function () {
+
+        var dataSources = [];
+        var allRooms = Rooms.find().fetch();
+
+        for (var i = 0; i < allRooms.length; i++) {
+            var data = [];
+
+            var currentRoom = allRooms[i];
+            var currentRoomCenter = Centers.findOne(currentRoom.center);
+
+            data.push(currentRoomCenter.name + ' - ' + currentRoom.description);
+
+            var currentRoomRservations = Reservations.find({
+                room: currentRoom._id,
+            }).fetch();
+
+            var allHoursDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+            for (var y = 0; y < currentRoomRservations.length; y++) {
+                var currentRoomRservation = currentRoomRservations[y];
+
+                var startHour = new Date(currentRoomRservation.startDateTime).getHours();
+                var endHour = new Date(currentRoomRservation.endDateTime).getHours();
+
+                for (var i = startHour; i < endHour; i++) {
+                    allHoursDistribution[i]++;
+                }
+
+            }
+
+            data = data.concat(allHoursDistribution);
+            dataSources.push(data);
+        }
+
+        return {
+            data: {
+                columns: dataSources,
+                type: 'area-step',
+            },
+            title: {
+                text: '於不同時間的預約次數分佈'
+            },
+            axis: {
+                x: {
+                    tick: {
+                        culling: false,
+                        count: 24,
+                        fit: true,
+                    },
+                    label: {
+                        text: 'Hour',
+                        position: 'outer-left'
+                    },
+                },
+                y: {
+                    label: {
+                        text: '次數',
+                        position: 'outer-bottom',
+                    },
+                    center: 10
+                }
+            },
+            line: {
+                step: {
+                    type: 'step-after'
+                }
+            }
+        };
+    },
 
     line_RservationTimeSlotDistribution: function () {
         var dataSources = [];
@@ -26,7 +98,7 @@ Template.analytics.helpers({
                 room: currentRoom._id,
             }).fetch();
 
-            var allHoursDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ];
+            var allHoursDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,];
 
             for (var y = 0; y < currentRoomRservations.length; y++) {
                 var currentRoomRservation = currentRoomRservations[y];

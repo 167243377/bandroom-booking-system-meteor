@@ -141,6 +141,7 @@ oauth1@1.1.11
 oauth2@1.1.11
 observe-sequence@1.0.16
 ordered-dict@1.0.9
+perak:c3@1.0.7
 percolate:momentum@0.7.2
 percolate:momentum-iron-router@0.7.0
 percolate:velocityjs@1.2.1_1
@@ -156,6 +157,7 @@ reload@1.1.11
 retry@1.0.9
 reywood:publish-composite@1.4.2
 routepolicy@1.0.12
+sergeyt:d3@3.4.1
 service-configuration@1.0.11
 session@1.1.7
 sha@1.0.9

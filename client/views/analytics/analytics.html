@@ -1,5 +1,8 @@
 <template name="analytics">
-	{{> highchartsHelper chartId="bookedTimeSlotDistribution" chartWidth="100%" chartHeight="100%" chartObject=line_RservationTimeSlotDistribution}}
+
+	<div class="row" style="background: #ffffff">
+		{{> c3 myChartData}}
+	</div>
 
 	<br>
 
