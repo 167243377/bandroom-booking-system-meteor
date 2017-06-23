@@ -169,6 +169,8 @@ Schemas.Rooms = new SimpleSchema({
 
         type: [String],
 
+        optional: true,
+
         label: '相片',
 
     },

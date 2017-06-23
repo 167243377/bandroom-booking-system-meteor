@@ -9,7 +9,12 @@ Template.analytics.onCreated(function () {
     }
 });
 
+var centerNamesMapping = [];
+
 Template.analytics.onRendered(() => {
+
+
+
 });
 
 // myTemplate.js
@@ -21,12 +26,17 @@ Template.analytics.helpers({
         var allRooms = Rooms.find().fetch();
 
         for (var i = 0; i < allRooms.length; i++) {
+
             var data = [];
 
             var currentRoom = allRooms[i];
             var currentRoomCenter = Centers.findOne(currentRoom.center);
 
-            data.push(currentRoomCenter.name + ' - ' + currentRoom.description);
+            if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
+                centerNamesMapping.push(currentRoomCenter.name);
+            }
+            
+            data.push((centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description);
 
             var currentRoomRservations = Reservations.find({
                 room: currentRoom._id,
@@ -40,8 +50,8 @@ Template.analytics.helpers({
                 var startHour = new Date(currentRoomRservation.startDateTime).getHours();
                 var endHour = new Date(currentRoomRservation.endDateTime).getHours();
 
-                for (var i = startHour; i < endHour; i++) {
-                    allHoursDistribution[i]++;
+                for (var x = startHour; x < endHour; x++) {
+                    allHoursDistribution[x]++;
                 }
 
             }
@@ -94,6 +104,10 @@ Template.analytics.helpers({
             var currentRoom = allRooms[i];
             var currentRoomCenter = Centers.findOne(currentRoom.center);
 
+            if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
+                centerNamesMapping.push(currentRoomCenter.name);
+            }
+
             var currentRoomRservations = Reservations.find({
                 room: currentRoom._id,
             }).fetch();
@@ -111,7 +125,7 @@ Template.analytics.helpers({
             }
 
             dataSources.push({
-                name: currentRoomCenter.name + ' - ' + currentRoom.description,
+                name: (centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description,
                 data: allHoursDistribution
             });
         }
@@ -173,12 +187,16 @@ Template.analytics.helpers({
             var currentRoom = allRooms[i];
             var currentRoomCenter = Centers.findOne(currentRoom.center);
 
+            if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
+                centerNamesMapping.push(currentRoomCenter.name);
+            }
+
             var currentRoomBookedCount = Reservations.find({
                 room: currentRoom._id
             }).fetch().length;
 
             dataSources.push({
-                name: currentRoomCenter.name + ' - ' + currentRoom.description,
+                name: (centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description,
                 y: currentRoomBookedCount
             });
         }
@@ -213,7 +231,7 @@ Template.analytics.helpers({
 
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}</b> out of ' + Reservations.find().fetch().length + '次 <br/>'
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:f}次</b> out of ' + Reservations.find().fetch().length + '次 <br/>'
             },
 
             series: [{
@@ -232,12 +250,16 @@ Template.analytics.helpers({
             var currentRoom = allRooms[i];
             var currentRoomCenter = Centers.findOne(currentRoom.center);
 
+            if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
+                centerNamesMapping.push(currentRoomCenter.name);
+            }
+
             var currentRoomBookedCount = Reservations.find({
                 room: currentRoom._id
             }).fetch().length;
 
             dataSources.push({
-                name: currentRoomCenter.name + ' - ' + currentRoom.description,
+                name: (centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description,
                 y: currentRoomBookedCount
             });
         }
@@ -281,9 +303,15 @@ Template.analytics.helpers({
         var allRooms = Rooms.find().fetch();
         var totalIncomeFromAllRoom = 0;
 
+
+
         for (var i = 0; i < allRooms.length; i++) {
             var currentRoom = allRooms[i];
             var currentRoomCenter = Centers.findOne(currentRoom.center);
+
+            if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
+                centerNamesMapping.push(currentRoomCenter.name);
+            }
 
             var currentRoomRservations = Reservations.find({
                 room: currentRoom._id
@@ -299,7 +327,7 @@ Template.analytics.helpers({
             totalIncomeFromAllRoom = totalIncomeFromAllRoom + totalIncomeFromCurrentRoom;
 
             dataSources.push({
-                name: currentRoomCenter.name + ' - ' + currentRoom.description,
+                name: (centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description,
                 y: totalIncomeFromCurrentRoom
             });
         }
@@ -328,7 +356,7 @@ Template.analytics.helpers({
                     borderWidth: 0,
                     dataLabels: {
                         enabled: false,
-                        format: '{point.y:f} of $' + totalIncomeFromAllRoom
+                        format: '$ {point.y:f} of $' + totalIncomeFromAllRoom
                     }
                 }
             },
@@ -354,6 +382,10 @@ Template.analytics.helpers({
             var currentRoom = allRooms[i];
             var currentRoomCenter = Centers.findOne(currentRoom.center);
 
+            if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
+                centerNamesMapping.push(currentRoomCenter.name);
+            }
+
             var currentRoomRservations = Reservations.find({
                 room: currentRoom._id
             }).fetch();
@@ -367,7 +399,7 @@ Template.analytics.helpers({
             }
 
             dataSources.push({
-                name: currentRoomCenter.name + ' - ' + currentRoom.description,
+                name: (centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description,
                 y: totalIncomeFromCurrentRoom
             });
         }
@@ -404,5 +436,21 @@ Template.analytics.helpers({
                 data: dataSources
             }]
         }
+    },
+
+    showCenterNameMapping: function () {
+        setTimeout(function () {
+            var centerNameMapping = document.getElementById("centerNameMapping");
+
+            centerNamesMapping.forEach(val => {
+                var entry = document.createElement('b');
+
+                entry.appendChild(document.createTextNode((centerNamesMapping.indexOf(val) +1 ) + " － " + val));
+
+                centerNameMapping.appendChild(entry);
+            })
+
+
+        }, 500)
     }
 });

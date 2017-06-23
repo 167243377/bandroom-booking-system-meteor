@@ -15,6 +15,7 @@ this.Attachments = new FS.Collection("Attachments", {
     if (Meteor.isClient) {
       alert(message);
     } else {
+      console.log('Error caught while uploading a image');
       console.log(message);
     }
   }

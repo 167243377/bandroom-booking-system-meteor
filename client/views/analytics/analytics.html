@@ -1,5 +1,14 @@
 <template name="analytics">
 
+	<div class="row">
+		<ol id="centerNameMapping">
+			<h4>中心代號：</h4>
+			{{showCenterNameMapping}}
+		</ol>
+	</div>
+
+	<br>
+
 	<div class="row" style="background: #ffffff">
 		{{> c3 myChartData}}
 	</div>

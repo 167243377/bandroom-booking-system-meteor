@@ -18,7 +18,6 @@ raix:handlebar-helpers
 cfs:standard-packages
 cfs:gridfs
 aldeed:template-extension
-cfs:graphicsmagick
 yogiben:helpers
 iron:router
 yogiben:autoform-modals
@@ -34,7 +33,6 @@ accounts-ui@1.1.9
 jparker:gravatar
 tap:i18n
 useraccounts:bootstrap
-service-configuration@1.0.11
 yogiben:mixpanel
 juliancwirko:s-alert
 juliancwirko:s-alert-stackslide
@@ -87,3 +85,4 @@ yogiben:admin
 yogiben:autoform-map
 nimble:restivus
 perak:c3
+cfs:graphicsmagick
