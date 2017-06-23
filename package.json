@@ -4,13 +4,11 @@
   "description": "BandRoom Booking System (Backend) built with Meteor",
   "main": "index.js",
   "dependencies": {
-    "babel-runtime": "^6.23.0",
-    "bcrypt": "^1.0.2",
-    "chart.js": "^2.5.0"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "export MONGO_URL=mongodb://admin:admin@ds157040.mlab.com:57040/band-room-booking-system&meteor"
+    "start": "meteor",
+    "deploy": "meteor deploy bandroom-booking.meteorapp.com --settings prd.json"
   },
   "repository": {
     "type": "git",

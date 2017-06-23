@@ -1,0 +1,8 @@
+{
+  "galaxy.meteor.com": {
+    "env": {
+      "ROOT_URL": "http://bandroom-booking.meteorapp.com",
+      "MONGO_URL": "mongodb://admin:admin@ds157040.mlab.com:57040/band-room-booking-system"
+    }
+  }
+}
