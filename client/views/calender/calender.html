@@ -1,6 +1,19 @@
 <template name="calender">
 
-  <p>查看指定日期: <input type="text" id="gotodate-datepicker"> <button class="goToTargetdDate">Move</button></p>
-  <div id="myCalendar" item-width="80%" item-height="80%"></div>
+	<p>
+		<div>
+			<button type="button" class="btn btn-link" data-toggle="collapse" data-target="#centerNameMapping">中心代號：</button>
+		</div>
+
+		<span id="centerNameMapping" class="collapse">
+			{{　showCenterNameMapping　}}
+		</span>
+	</p>
+
+	<p>查看指定日期: <input type="text" id="gotodate-datepicker">
+		<button class="goToTargetdDate">Move</button>
+	</p>
+
+	<div id="myCalendar" class="row"></div>
 
 </template>

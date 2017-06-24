@@ -1,3 +1,5 @@
+var centerNamesMapping = [];
+
 Template.analytics.onCreated(function () {
     if (Meteor.isClient) {
         var self = this;
@@ -9,11 +11,7 @@ Template.analytics.onCreated(function () {
     }
 });
 
-var centerNamesMapping = [];
-
 Template.analytics.onRendered(() => {
-
-
 
 });
 
@@ -35,11 +33,12 @@ Template.analytics.helpers({
             if (centerNamesMapping.indexOf(currentRoomCenter.name) == -1) {
                 centerNamesMapping.push(currentRoomCenter.name);
             }
-            
+
             data.push((centerNamesMapping.indexOf(currentRoomCenter.name) + 1) + ' - ' + currentRoom.description);
 
             var currentRoomRservations = Reservations.find({
                 room: currentRoom._id,
+                status: { $in: ["To Be Started", "Closed"] }
             }).fetch();
 
             var allHoursDistribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -445,7 +444,7 @@ Template.analytics.helpers({
             centerNamesMapping.forEach(val => {
                 var entry = document.createElement('b');
 
-                entry.appendChild(document.createTextNode((centerNamesMapping.indexOf(val) +1 ) + " － " + val));
+                entry.appendChild(document.createTextNode((centerNamesMapping.indexOf(val) + 1) + " － " + val));
 
                 centerNameMapping.appendChild(entry);
             })

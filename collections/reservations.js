@@ -40,17 +40,18 @@ Schemas.Reservations = new SimpleSchema({
                 Meteor.subscribe('reservations');
             }
 
-            var startDateTime = new Date(this.value);
-            var selectedRoom = Rooms.findOne(this.field('room').value);
+            if (Meteor.isServer) {
 
-            //Rules #1: not in a 15 mintues period
-            if (new Date(this.value).getMinutes() % 15 != 0) {
-                return "dateTimeMustbeIn15MintuesTimeSlot";
-            }
+                var startDateTime = new Date(this.value);
+                startDateTime = startDateTime.addHours(-8);
+                var selectedRoom = Rooms.findOne(this.field('room').value);
 
-            //Rules #2.1 check whether the booking day is the buiness day of selected center
+                //Rules #1: not in a 15 mintues period
+                if (new Date(this.value).getMinutes() % 15 != 0) {
+                    return "dateTimeMustbeIn15MintuesTimeSlot";
+                }
 
-            if (Meteor.isClient) {
+                //Rules #2.1 check whether the booking day is the buiness day of selected center
                 var selectedRoomCenter = Centers.findOne(selectedRoom.center);
 
                 var weekDayLetter = convertWeekDayNumberToLetter(startDateTime.getDay());
@@ -85,7 +86,7 @@ Schemas.Reservations = new SimpleSchema({
                 if (selectedRoomCenter.nonAvailablePeriod !== undefined) {
                     if (selectedRoomCenter.nonAvailablePeriod.length > 0) {
                         startDateTime = new Date(this.value);
-
+                        startDateTime = startDateTime.addHours(-8);
                         for (var i = 0; i < selectedRoomCenter.nonAvailablePeriod.length; i++) {
 
                             var currentNonAvailablePeriod = selectedRoomCenter.nonAvailablePeriod[i];
@@ -105,55 +106,58 @@ Schemas.Reservations = new SimpleSchema({
                         }
                     }
                 }
-            }
-            //Rules #3: check whether the room has non available booking period
-            if (selectedRoom.nonAvailablePeriod !== undefined) {
-                startDateTime = new Date(this.value);
-                if (selectedRoom.nonAvailablePeriod.length > 0) {
 
-                    for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
+                //Rules #3: check whether the room has non available booking period
+                if (selectedRoom.nonAvailablePeriod !== undefined) {
+                    startDateTime = new Date(this.value);
+                    startDateTime = startDateTime.addHours(-8);
+                    if (selectedRoom.nonAvailablePeriod.length > 0) {
 
-                        var currentNonAvailablePeriod = selectedRoom.nonAvailablePeriod[i];
+                        for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
 
-                        var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
-                        var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
+                            var currentNonAvailablePeriod = selectedRoom.nonAvailablePeriod[i];
 
-                        //setHours to 0, we just compare the date only
-                        currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
-                        currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
-                        startDateTime.setHours(0, 0, 0, 0);
+                            var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
+                            var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
 
-                        if (startDateTime >= currentNonAvailablePeriodStartDate && startDateTime <= currentNonAvailablePeriodEndDate) {
-                            console.log('this period cannot be booked 2');
-                            console.log('currentNonAvailablePeriodStartDate');
-                            console.log(currentNonAvailablePeriodStartDate);
-                            console.log('currentNonAvailablePeriodEndDate');
-                            console.log(currentNonAvailablePeriodEndDate);
-                            console.log('startDateTime');
-                            console.log(startDateTime);
+                            //setHours to 0, we just compare the date only
+                            currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
+                            currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
+                            startDateTime.setHours(0, 0, 0, 0);
 
-                            return "nonAvailableBookingPeriod";
+                            if (startDateTime >= currentNonAvailablePeriodStartDate && startDateTime <= currentNonAvailablePeriodEndDate) {
+                                console.log('this period cannot be booked 2');
+                                console.log('currentNonAvailablePeriodStartDate');
+                                console.log(currentNonAvailablePeriodStartDate);
+                                console.log('currentNonAvailablePeriodEndDate');
+                                console.log(currentNonAvailablePeriodEndDate);
+                                console.log('startDateTime');
+                                console.log(startDateTime);
+
+                                return "nonAvailableBookingPeriod";
+                            }
+
                         }
-
                     }
                 }
-            }
 
 
-            //Rules #4: check whether the room have already been booked.
-            startDateTime = new Date(this.value);
-            var localISOString = toLocaleISOString(startDateTime);
+                //Rules #4: check whether the room have already been booked.
+                startDateTime = new Date(this.value);
+                startDateTime = startDateTime.addHours(-8);
+                var localISOString = toLocaleISOString(startDateTime);
 
-            var overlapReservation = Reservations.find({
-                room: selectedRoom._id,
-                status: { $in: ["To Be Started", "Closed"] },
-                startDateTime: { $lte: localISOString },
-                endDateTime: { $gt: localISOString },
-                _id: { $ne: this.docId }
-            }).fetch()
+                var overlapReservation = Reservations.find({
+                    room: selectedRoom._id,
+                    status: { $in: ["To Be Started", "Closed"] },
+                    startDateTime: { $lte: localISOString },
+                    endDateTime: { $gt: localISOString },
+                    _id: { $ne: this.docId }
+                }).fetch()
 
-            if (overlapReservation.length > 0) {
-                return "overlapReservationPeriod";
+                if (overlapReservation.length > 0) {
+                    return "overlapReservationPeriod";
+                }
             }
         }
     },
@@ -169,39 +173,42 @@ Schemas.Reservations = new SimpleSchema({
                 Meteor.subscribe('reservations');
             }
 
-            var startDateTime = new Date(this.field('startDateTime').value);
-            var endDateTime = new Date(this.value);
+            if (Meteor.isServer) {
 
-            console.log('startDateTime');
-            console.log(startDateTime);
+                var startDateTime = new Date(this.field('startDateTime').value);
+                startDateTime = startDateTime.addHours(-8);
+                var endDateTime = new Date(this.value);
+                endDateTime = endDateTime.addHours(-8);
 
-            console.log('endDateTime');
-            console.log(endDateTime);
+                console.log('startDateTime');
+                console.log(startDateTime);
 
-            var selectedRoom = Rooms.findOne(this.field('room').value);
+                console.log('endDateTime');
+                console.log(endDateTime);
 
-            //Rules #1: not in a 15 mintues period
-            if (endDateTime.getMinutes() % 15 != 0) {
-                return "dateTimeMustbeIn15MintuesTimeSlot";
-            }
+                var selectedRoom = Rooms.findOne(this.field('room').value);
 
-            //Rules #2: endDateTime cannot less than and eqaul to startDateTime
-            if (endDateTime < startDateTime) {
-                return "EndTimeMustBeGreaterThanStartTime";
-            }
+                //Rules #1: not in a 15 mintues period
+                if (endDateTime.getMinutes() % 15 != 0) {
+                    return "dateTimeMustbeIn15MintuesTimeSlot";
+                }
 
-            //Rules #3: at least book 30 mins
-            var diffDate = new Date(endDateTime - startDateTime);
-            var diffHours = Math.floor((diffDate % 86400000) / 3600000);
-            var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
+                //Rules #2: endDateTime cannot less than and eqaul to startDateTime
+                if (endDateTime < startDateTime) {
+                    return "EndTimeMustBeGreaterThanStartTime";
+                }
 
-            if (diffMintues < 30) {
-                return "atleastBook30Mins";
-            }
+                //Rules #3: at least book 30 mins
+                var diffDate = new Date(endDateTime - startDateTime);
+                var diffHours = Math.floor((diffDate % 86400000) / 3600000);
+                var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
+
+                if (diffMintues < 30) {
+                    return "atleastBook30Mins";
+                }
 
 
-            //Rules #4.1 check whether the booking day is the buiness day of selected center
-            if (Meteor.isClient) {
+                //Rules #4.1 check whether the booking day is the buiness day of selected center
                 var selectedRoomCenter = Centers.findOne(selectedRoom.center);
 
                 if (startDateTime.getDate() === endDateTime.getDate()) {
@@ -260,6 +267,7 @@ Schemas.Reservations = new SimpleSchema({
                     if (selectedRoomCenter.nonAvailablePeriod.length > 0) {
 
                         endDateTime = new Date(this.value);
+                        endDateTime = endDateTime.addHours(-8);
 
                         for (var i = 0; i < selectedRoomCenter.nonAvailablePeriod.length; i++) {
 
@@ -281,47 +289,50 @@ Schemas.Reservations = new SimpleSchema({
                     }
                 }
 
-            }
 
-            //Rules #4.3: check whether the room has non available booking period
-            if (selectedRoom.nonAvailablePeriod !== undefined) {
-                if (selectedRoom.nonAvailablePeriod.length > 0) {
-                    console.log(this.value);
-                    endDateTime = new Date(this.value);
+                //Rules #4.3: check whether the room has non available booking period
+                if (selectedRoom.nonAvailablePeriod !== undefined) {
+                    if (selectedRoom.nonAvailablePeriod.length > 0) {
 
-                    for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
+                        endDateTime = new Date(this.value);
+                        endDateTime = endDateTime.addHours(-8);
+                        console.log(this.value);
 
-                        var currentNonAvailablePeriod = selectedRoom.nonAvailablePeriod[i];
+                        for (var i = 0; i < selectedRoom.nonAvailablePeriod.length; i++) {
 
-                        var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
-                        var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
+                            var currentNonAvailablePeriod = selectedRoom.nonAvailablePeriod[i];
 
-                        //setHours to 0, we just compare the date only
-                        currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
-                        currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
-                        endDateTime.setHours(0, 0, 0, 0);
+                            var currentNonAvailablePeriodStartDate = new Date(currentNonAvailablePeriod.startDate);
+                            var currentNonAvailablePeriodEndDate = new Date(currentNonAvailablePeriod.endDate);
 
-                        if (endDateTime >= currentNonAvailablePeriodStartDate && endDateTime <= currentNonAvailablePeriodEndDate) {
-                            return "nonAvailableBookingPeriod";
+                            //setHours to 0, we just compare the date only
+                            currentNonAvailablePeriodStartDate.setHours(0, 0, 0, 0);
+                            currentNonAvailablePeriodEndDate.setHours(0, 0, 0, 0);
+                            endDateTime.setHours(0, 0, 0, 0);
+
+                            if (endDateTime >= currentNonAvailablePeriodStartDate && endDateTime <= currentNonAvailablePeriodEndDate) {
+                                return "nonAvailableBookingPeriod";
+                            }
                         }
                     }
                 }
-            }
 
-            //Rules #5: check whether the room have already been booked.
-            endDateTime = new Date(this.value);
-            var localISOString = toLocaleISOString(endDateTime);
+                //Rules #5: check whether the room have already been booked.
+                endDateTime = new Date(this.value);
+               endDateTime = endDateTime.addHours(-8);
+                var localISOString = toLocaleISOString(endDateTime);
 
-            var overlapReservation = Reservations.find({
-                room: selectedRoom._id,
-                status: { $in: ["To Be Started", "Closed"] },
-                startDateTime: { $lt: localISOString },
-                endDateTime: { $gte: localISOString },
-                _id: { $ne: this.docId }
-            }).fetch()
+                var overlapReservation = Reservations.find({
+                    room: selectedRoom._id,
+                    status: { $in: ["To Be Started", "Closed"] },
+                    startDateTime: { $lt: localISOString },
+                    endDateTime: { $gte: localISOString },
+                    _id: { $ne: this.docId }
+                }).fetch()
 
-            if (overlapReservation.length > 0) {
-                return "overlapReservationPeriod";
+                if (overlapReservation.length > 0) {
+                    return "overlapReservationPeriod";
+                }
             }
         }
     },
@@ -551,14 +562,16 @@ if (Meteor.isServer) {
             var bodyParams = this.bodyParams;
             console.log(bodyParams);
 
-            var diffDate = (new Date(bodyParams.endDateTime) - new Date(bodyParams.startDateTime));
-            var diffHours = Math.floor((diffDate % 86400000) / 3600000);
-            var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
+            // var diffDate = (new Date(bodyParams.endDateTime) - new Date(bodyParams.startDateTime));
+            // var diffHours = Math.floor((diffDate % 86400000) / 3600000);
+            // var diffMintues = (diffHours * 60) + Math.round(((diffDate % 86400000) % 3600000) / 60000); // minutes
 
-            var totalAmount;
-            //total mintues / 60 = hours
+            // var totalAmount;
+            // //total mintues / 60 = hours
             var selectedRoom = Rooms.findOne(bodyParams.room);
-            totalAmount = selectedRoom.price * (diffMintues / 60);
+            // totalAmount = selectedRoom.price * (diffMintues / 60);
+
+            var totalAmount = bodyParams.totalAmount;
 
             var startDateTime = new Date(bodyParams.startDateTime);
 
@@ -566,8 +579,8 @@ if (Meteor.isServer) {
 
             var newReservation = {
                 "room": bodyParams.room,
-                "startDateTime": startDateTime.toISOString(),
-                "endDateTime": endDateTime.toISOString(),
+                "startDateTime": toLocaleISOString(startDateTime),
+                "endDateTime": toLocaleISOString(endDateTime),
                 "phoneNo": bodyParams.phoneNo,
                 "contactName": bodyParams.contactName,
                 "status": "To Be Started",
@@ -608,6 +621,7 @@ if (Meteor.isServer) {
                         name: center.name
                     },
                 },
+                totalAmount: reservation.totalAmount,
                 bookingData: {
                     bookDate: new Date(reservation.startDateTime).toUTCDate(),
                     startDateTime: startDateTime,

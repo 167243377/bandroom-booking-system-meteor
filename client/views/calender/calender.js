@@ -1,3 +1,5 @@
+var centerNamesMapping = [];
+
 Template.calender.onCreated(function () {
     var isRefresh = false;
     var previousReservationsCount = 0;
@@ -5,46 +7,60 @@ Template.calender.onCreated(function () {
     var previousRservationId = "";
 
     var self = this;
-    self.autorun(function () {
-        self.subscribe("rooms");
-        self.subscribe("centers");
-        self.subscribe("reservations", function () {
-            Tracker.autorun(function () {
 
-                //check whether a new reservation is added, a reactive display (real-time)
-                if (previousReservationsCount != 0 && previousReservationsCount < Reservations.find().count()) {
+    self.subscribe("rooms");
+    self.subscribe("centers");
 
-                    let newReservation = Reservations.findOne({}, {
-                        sort: {
-                            createdAt: -1,
-                            limit: 1
-                        }
-                    });
+    self.subscribe("reservations", function () {
+        self.autorun(function () {
+            //check whether a new reservation is added, a reactive display (real-time)
+            if (previousReservationsCount != 0 && previousReservationsCount < Reservations.find().count()) {
 
-                    let newReservationRoom = Rooms.findOne(newReservation.room);
-                    let newReservationCenter = Centers.findOne(newReservationRoom.center);
+                let newReservation = Reservations.findOne({}, {
+                    sort: {
+                        createdAt: -1,
+                        limit: 1
+                    }
+                });
 
-                    playNotifySound();
+                let newReservationRoom = Rooms.findOne(newReservation.room);
+                let newReservationCenter = Centers.findOne(newReservationRoom.center);
 
-                    setTimeout(function () {
-                        alert('有一個新預約' + '\n' +
-                            "房間: " + newReservationCenter.name + " - " + newReservationRoom.description + '\n' +
-                            '預約時間: ' + formatDate(newReservation.startDateTime) + ' - ' + formatDate(newReservation.endDateTime));
-                        return false;
-                    }, 1000);
-                    //Timeout makes asynchronous
-                }
+                playNotifySound();
 
-                showReservations();
+                setTimeout(function () {
+                    alert('有一個新預約' + '\n' +
+                        "房間: " + newReservationCenter.name + " - " + newReservationRoom.description + '\n' +
+                        '預約時間: ' + formatDate(newReservation.startDateTime) + ' - ' + formatDate(newReservation.endDateTime));
+                    return false;
+                }, 1000);
+                //Timeout makes asynchronous
+            }
 
-                previousReservationsCount = Reservations.find().count();
+            showReservations();
 
-            })
+            previousReservationsCount = Reservations.find().count();
         });
     });
 });
 
-Template.calender.helpers({});
+Template.calender.helpers({
+    showCenterNameMapping: function () {
+        setTimeout(function () {
+            var centerNameMapping = document.getElementById("centerNameMapping");
+
+            centerNamesMapping.forEach(val => {
+                var entry = document.createElement('b');
+
+                entry.appendChild(document.createTextNode((centerNamesMapping.indexOf(val) + 1) + " － " + val));
+
+                centerNameMapping.appendChild(entry);
+            })
+
+
+        }, 500)
+    }
+});
 
 Template.calender.events({
     "click .goToTargetdDate": function () {
@@ -65,7 +81,6 @@ Template.calender.onRendered(() => {
 
 function showReservations() {
 
-    console.log('showReservations');
     let reservations = [];
     let targetedReservations = Reservations.find();
     targetedReservations.fetch().map((reservation) => {
@@ -83,9 +98,14 @@ function showReservations() {
 
         let targetedCenter = Centers.findOne(targetedRoom.center);
 
+        if (centerNamesMapping.indexOf(targetedCenter.name) == -1) {
+            centerNamesMapping.push(targetedCenter.name);
+        }
+
         reservations.push({
             id: reservation._id,
-            resourceId: targetedCenter.name + " - " + targetedRoom.description,
+            // resourceId: targetedCenter.name + " - " + targetedRoom.description,
+            resourceId: (centerNamesMapping.indexOf(targetedCenter.name) + 1) + " — " + targetedRoom.description,
             title: reservation.status,
             start: reservation.startDateTime,
             end: reservation.endDateTime,
@@ -99,7 +119,8 @@ function showReservations() {
     $('#myCalendar').fullCalendar({
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         defaultView: 'agendaDay',
-        aspectRatio: 2,
+        height: 'auto',
+
         header: {
             left: 'prev,next today customButton_NewReservation',
             center: 'title',
@@ -119,15 +140,15 @@ function showReservations() {
             window.open('http://localhost:3000/admin/Reservations/' + calEvent.id + '/edit');
         },
         resourceColumns: [{
-                labelText: '中心',
-                field: 'center',
-                width: '20%',
-            },
-            {
-                labelText: '房間',
-                field: 'room',
-                width: '20%'
-            }
+            labelText: '中心',
+            field: 'center',
+            width: '20%',
+        },
+        {
+            labelText: '房間',
+            field: 'room',
+            width: '20%'
+        }
         ],
         resources: function (callback) {
             let roomOptions = [];
@@ -138,8 +159,8 @@ function showReservations() {
                 let targetedCenter = Centers.findOne(room.center);
 
                 roomOptions.push({
-                    id: targetedCenter.name + " - " + room.description,
-                    center: targetedCenter.name,
+                    id: (centerNamesMapping.indexOf(targetedCenter.name) + 1) + " — " + room.description,
+                    center: (centerNamesMapping.indexOf(targetedCenter.name) + 1),
                     room: room.description
                 })
             })
