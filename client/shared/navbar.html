@@ -12,14 +12,6 @@
               {{#if User}}
                 <div class="panel-heading">{{niceName User._id}}</div>
                 <div class="list-group">
-                  <a class="list-group-item" href="{{pathFor 'profile'}}">{{_ "profile"}}</a>
-                  <a class="list-group-item" href="{{pathFor 'account'}}">{{_ "account"}}</a>
-                  <a class="list-group-item" href="{{pathFor 'notifications'}}">
-                    {{#if notificationCount}}
-                      <span class="badge bg-success">{{notificationCount}}</span>
-                    {{/if}}
-                    {{_ "notifications"}}
-                  </a>
                   <a class="list-group-item" href="/sign-out">{{_ "signout"}}</a>
                 </div>
               {{/if}}
@@ -27,6 +19,7 @@
           </div>
           <a class="navbar-brand" href="{{#if User}}{{Config.dashboardRoute}}{{else}}{{Config.homeRoute}}{{/if}}">{{{Config.logo}}}</a>
         </div>
+        
         <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right">
             {{#if User}}
@@ -35,9 +28,6 @@
                 <li><a href="{{pathFor 'adminDashboard'}}">{{_ "admin"}}</a></li>
               {{/if}}
               {{> userDropdown}}
-              <li class="visible-xs">
-                <a href="{{pathFor 'profile'}}" class="close-navbar">{{_ "edit_profile"}}</a>
-              </li>
               <li class="visible-xs">
                 <a class="close-navbar" href="/sign-out">{{_ "signout"}}</a>
               </li>

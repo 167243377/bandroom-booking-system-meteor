@@ -1,4 +1,5 @@
 var centerNamesMapping = [];
+var isShowCancelledReservation = false;
 
 Template.calender.onCreated(function () {
     var isRefresh = false;
@@ -82,18 +83,20 @@ Template.calender.onRendered(() => {
 function showReservations() {
 
     let reservations = [];
-    let targetedReservations = Reservations.find();
-    targetedReservations.fetch().map((reservation) => {
+    let targetedReservations = Reservations.find().fetch();
 
+
+    for (var i = 0; i < targetedReservations.length; i++) {
+        let reservation = targetedReservations[i];
         let targetedRoom = Rooms.findOne(reservation.room);
         let statusColor = '';
 
         if (reservation.status === 'Closed') {
-            statusColor = 'green'
+            statusColor = '#2E7D32'
         } else if (reservation.status === 'Cancelled') {
-            statusColor = 'red'
+            statusColor = '#B71C1C'
         } else if (reservation.status === 'To Be Started') {
-            statusColor = 'blue'
+            statusColor = '#01579B'
         }
 
         let targetedCenter = Centers.findOne(targetedRoom.center);
@@ -112,17 +115,17 @@ function showReservations() {
             editable: false,
             color: statusColor
         })
-    })
+    }
 
     //refresh use, create after destroy
     $('#myCalendar').fullCalendar('destroy');
     $('#myCalendar').fullCalendar({
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         defaultView: 'agendaDay',
-        height: 'auto',
+        height: window.innerHeight - 300,
 
         header: {
-            left: 'prev,next today customButton_NewReservation',
+            left: 'prev,next today customButton_NewReservation customButton_ShowCancel',
             center: 'title',
             right: 'agendaDay,timelineDay,basicWeek,month',
         },
@@ -131,6 +134,29 @@ function showReservations() {
                 text: '建立預約',
                 click: function () {
                     window.open('http://localhost:3000/admin/Reservations/new');
+                }
+            },
+            customButton_ShowCancel: {
+                text: '顯示/隱藏已取消預約',
+                click: function () {
+
+                    if (isShowCancelledReservation) {
+                        $('#myCalendar').fullCalendar('removeEvents');
+                        $('#myCalendar').fullCalendar('addEventSource',
+                            reservations
+                        )
+
+                        isShowCancelledReservation = false;
+                    } else {
+                        $('#myCalendar').fullCalendar('removeEvents');
+                        $('#myCalendar').fullCalendar('addEventSource',
+                            reservations.filter(reservation => {
+                                return reservation.title !== "Cancelled";
+                            })
+                        )
+
+                        isShowCancelledReservation = true;
+                    }
                 }
             }
         },
