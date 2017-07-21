@@ -618,7 +618,8 @@ if (Meteor.isServer) {
                     _id: room._id,
                     description: room.description,
                     center: {
-                        name: center.name
+                        name: center.name,
+                        contactNumber: center.contactNumber
                     },
                 },
                 totalAmount: reservation.totalAmount,
