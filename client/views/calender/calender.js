@@ -122,7 +122,7 @@ function showReservations() {
     $('#myCalendar').fullCalendar({
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         defaultView: 'agendaDay',
-        height: window.innerHeight - 300,
+        height: window.innerHeight - (window.innerHeight * 0.15),
 
         header: {
             left: 'prev,next today customButton_NewReservation customButton_ShowCancel',
