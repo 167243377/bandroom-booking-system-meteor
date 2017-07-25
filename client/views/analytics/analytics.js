@@ -447,6 +447,11 @@ Template.analytics.helpers({
                 entry.appendChild(document.createTextNode((centerNamesMapping.indexOf(val) + 1) + " － " + val));
 
                 centerNameMapping.appendChild(entry);
+
+                var br = document.createElement('br');
+
+                centerNameMapping.appendChild(br);
+
             })
 
 
